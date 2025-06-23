@@ -1,9 +1,7 @@
 [project]
-name = "care_survival"
-requires-python = ">=3.7"
+name = "care-survival"
 version = "0.1.0"
-dependencies = [
-    "numpy",
-    "pandas",
-]
-
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
