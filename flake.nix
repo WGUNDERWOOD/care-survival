@@ -7,10 +7,7 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    crane.url = "github:ipetkov/crane";
   };
 
   outputs = inputs:
@@ -32,9 +29,9 @@
           cargoToml = ./Cargo.toml;
         }).version;
 
-        pythonVersion = pkgs.python310;
+        pythonVersion = pkgs.python312;
         wheelTail =
-          "cp310-cp310-manylinux_2_34_x86_64"; # change if pythonVersion changes
+          "cp312-cp312-linux_x86_64"; # change if pythonVersion changes
         wheelName = "${projectName}-${projectVersion}-${wheelTail}.whl";
 
         crateCfg = {
@@ -85,15 +82,8 @@
             src = ./.;
             nativeBuildInputs = [ packages.pythonEnv ];
           };
-          default = rust;
+          default = python;
         };
 
-        apps = rec {
-          ipython = {
-            type = "app";
-            program = "${packages.pythonEnv}/bin/ipython";
-          };
-          default = ipython;
-        };
       });
 }

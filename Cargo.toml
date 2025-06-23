@@ -1,11 +1,11 @@
 [package]
-name = "care-survival"
+name = "care_survival"
 version = "0.1.0"
 authors = ["William George Underwood"]
 edition = "2021"
 
 [lib]
-name = "care-survival"
+name = "care_survival"
 crate-type = ["cdylib"]
 
 [dependencies]
