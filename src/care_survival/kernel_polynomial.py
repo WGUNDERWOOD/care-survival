@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import cdist
 
 class PolynomialKernel:
     def __init__(self, a, p):
@@ -41,3 +42,25 @@ class PolynomialKernel:
 
     def feature_const(self):
         return self.a ** (self.p / 2)
+
+class ShiftedGaussianKernel:
+    def __init__(self, a, sigma):
+        self.a = a
+        self.sigma = sigma
+
+    def k(self, X1, X2):
+        self.a + np.exp(-cdist(X1, X2, metric="sqeuclidean") / (self.sigma**2))
+
+    def norm_one(self):
+        np.sqrt(1 / self.a)
+
+class ShiftedFirstOrderSobolevKernel:
+    def __init__(self, a):
+        self.a = a
+
+    def k(self, X1, X2):
+        let d = x.len();
+        self.a + np.min(X1, X2).sum(axis=1)
+
+    def norm_one(self):
+        np.sqrt(1 / self.a)

@@ -1,7 +1,7 @@
 import numpy as np
 from care_survival import data as care_data
 from care_survival import kernel_polynomial as kernel_polynomial
-#from care_survival import embedding as care_embedding
+from care_survival import embedding as care_embedding
 
 def get_test_data():
     n = 6
@@ -22,8 +22,10 @@ def main():
     #print(data.X)
     #print(kernel.k(data.X, data.X))
     #print(kernel.norm_one())
-    print(kernel.phi(data.X).shape)
-    #embed = care_embedding.EmbeddingData(data)
+    #print(kernel.phi(data.X).shape)
+    #method = "kernel"
+    method = "feature_map"
+    embed = care_embedding.EmbeddingData(data, kernel, method)
     #print(data.f_0)
 
 if __name__ == "__main__":
