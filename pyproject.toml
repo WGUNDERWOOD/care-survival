@@ -1,10 +1,10 @@
 [project]
 name = "care-survival"
 version = "0.1.0"
-description = "Add your description here"
+description = "Upgrading survival models with CARE"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["numpy", "pandas"]
 
 [build-system]
 requires = ["hatchling"]
