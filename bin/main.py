@@ -1,10 +1,11 @@
 import numpy as np
 from care_survival import data as care_data
-from care_survival import kernel_polynomial as kernel_polynomial
+from care_survival import kernel as care_kernel
 from care_survival import embedding as care_embedding
 
 def get_test_data():
     n = 6
+    #n = 10000
     d = 3
     m = 2
     X = np.random.random((n, d))
@@ -18,7 +19,7 @@ def main():
     data = get_test_data()
     a = 1
     p = 2
-    kernel = kernel_polynomial.PolynomialKernel(a, p)
+    kernel = care_kernel.PolynomialKernel(a, p)
     #print(data.X)
     #print(kernel.k(data.X, data.X))
     #print(kernel.norm_one())

@@ -1,5 +1,6 @@
+import numpy as np
+
 class EmbeddingData:
-    pass
 #    // data
 #    pub n: usize,
 #    pub d: usize,
@@ -28,8 +29,9 @@ class EmbeddingData:
 #    pub Phi_cent: Option<Array2<f64>>,
 
     def __init__(self, data, kernel, method):
-        #        // data
-        data_sorted = data.sort();
+        data.sort();
+        #print(data.X)
+        #print(data.T)
 #        let n = data_sorted.n;
 #        let n64 = n as f64;
 #        let d = data_sorted.d;
@@ -38,25 +40,36 @@ class EmbeddingData:
 #        let I = data_sorted.I;
 #        let N = Array1::from_shape_fn(n, |i| f64::from(!I[i]));
 #
-#        // Rj = min{i: Rij = 1}
-#        // R[j-1] <= R[j] <= j
-#        let mut R: Array1<usize> = vec![0; n].into();
-#        let mut R_prev = 0;
-#        for j in 0..n {
-#            let R_val = (R_prev..=j).find(|&i| T[i] >= T[j]).unwrap();
-#            R[j] = R_val;
-#            R_prev = R_val;
-#        }
-#
-#        // Zi = max{j: Rij = 1}
-#        // Z[i+1] >= Z[i] >= i
-#        let mut Z: Array1<usize> = vec![0; n].into();
-#        let mut Z_prev = n;
-#        for i in (0..n).rev() {
-#            let Z_val = (i..Z_prev).rev().find(|&j| T[i] >= T[j]).unwrap();
-#            Z[i] = Z_val;
-#            Z_prev = Z_val;
-#        }
+        data.T[2] = data.T[3]
+
+        # R
+        # TODO check this agrees with Rust
+        self.R = np.zeros(data.n)
+        R_prev = 0
+        for j in range(data.n):
+            candidates = np.arange(R_prev, j + 1)
+            mask = data.T[candidates] >= data.T[j]
+            R_val = candidates[np.argmax(mask)]
+            self.R[j] = R_val
+            R_prev = R_val
+
+        # Z
+        # TODO check this agrees with Rust
+        self.Z = np.zeros(data.n)
+        Z_prev = data.n
+        for i in reversed(range(data.n)):
+            candidates = np.arange(i, Z_prev)
+            mask = data.T[i] >= data.T[candidates]
+            Z_val = candidates[mask][-1]
+            self.Z[i] = Z_val
+            Z_prev = Z_val
+
+        #print(self.R)
+        #print(self.Z)
+
+
+
+
 #
 #        let R_bar = Array1::from_shape_fn(n, |i| ((n - R[i]) as f64) / n64);
 #        let ln_cent = (1..n).map(|i| R_bar[i].ln() * N[i]).sum::<f64>() / n64;

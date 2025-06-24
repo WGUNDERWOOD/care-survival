@@ -19,3 +19,7 @@ To publish to TestPyPI
 To publish to PyPI
 
 `uv publish --token <token>`
+
+To add a new package as a dependency
+
+`uv add <package>; uv lock`, then reload the nix development environment

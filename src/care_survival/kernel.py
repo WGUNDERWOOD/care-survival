@@ -1,77 +1,65 @@
-#// Shifted Gaussian kernel
-#
-#pub struct ShiftedGaussianKernel {
-#    pub a: f64,
-#    pub sigma: f64,
-#}
-#
-#impl ShiftedGaussianKernel {
-#    #[must_use]
-#    pub fn new(a: f64, sigma: f64) -> Self {
-#        Self { a, sigma }
-#    }
-#}
-#
-#impl Kernel for ShiftedGaussianKernel {
-#    fn k(&self, x: ArrayView1<f64>, y: ArrayView1<f64>) -> f64 {
-#        let d = x.len();
-#        self.a
-#            + (-(0..d)
-#                .map(|i| ((x[i] - y[i]) / self.sigma).powf(2.0))
-#                .sum::<f64>()
-#                / 1.0)
-#                .exp()
-#    }
-#
-#    fn norm_one(&self) -> f64 {
-#        (1.0 / self.a).powf(0.5)
-#    }
-#
-#    fn phi(&self, _x: ArrayView1<f64>) -> Array1<f64> {
-#        panic!()
-#    }
-#
-#    fn feature_dim(&self, _d: usize) -> usize {
-#        panic!()
-#    }
-#
-#    fn feature_const(&self) -> f64 {
-#        panic!()
-#    }
-#}
-#
-#// Shifted first order Sobolev kernel
-#
-#pub struct ShiftedFirstOrderSobolevKernel {
-#    pub a: f64,
-#}
-#
-#impl ShiftedFirstOrderSobolevKernel {
-#    #[must_use]
-#    pub fn new(a: f64) -> Self {
-#        Self { a }
-#    }
-#}
-#
-#impl Kernel for ShiftedFirstOrderSobolevKernel {
-#    fn k(&self, x: ArrayView1<f64>, y: ArrayView1<f64>) -> f64 {
-#        let d = x.len();
-#        self.a + (0..d).map(|i| x[i].min(y[i])).sum::<f64>()
-#    }
-#
-#    fn norm_one(&self) -> f64 {
-#        (1.0 / self.a).powf(0.5)
-#    }
-#
-#    fn phi(&self, _x: ArrayView1<f64>) -> Array1<f64> {
-#        panic!()
-#    }
-#
-#    fn feature_dim(&self, _d: usize) -> usize {
-#        panic!()
-#    }
-#
-#    fn feature_const(&self) -> f64 {
-#        panic!()
-#    }
-#}
+import numpy as np
+from scipy.spatial.distance import cdist
+
+class PolynomialKernel:
+    def __init__(self, a, p):
+        self.a = a
+        self.p = p
+
+    def k(self, X1, X2):
+        d = np.shape(X1)[1];
+        return (X1 @ X2.T / d + self.a) ** self.p
+
+    def norm_one(self):
+        return (1 / self.a) ** (self.p / 2)
+
+    def phi(self, X):
+        n = np.shape(X)[0];
+        d = np.shape(X)[1];
+        feature_dim = self.feature_dim(d);
+        if self.p == 1:
+            return X
+        elif self.p == 2:
+            phi_X = np.zeros((n, feature_dim))
+            r = 0
+            for i in range(d):
+                phi_X[:,r] = np.sqrt(2) * X[:,i] / np.sqrt(d);
+                r += 1
+            for i in range(d):
+                phi_X[:,r] = X[:,i] * X[:,i] / np.sqrt(d);
+                r += 1
+            for i in range(d):
+                for j in range(i):
+                    phi_X[:,r] = np.sqrt(2) * X[:,i] * X[:,j] / np.sqrt(d);
+                    r += 1;
+            return phi_X
+
+    def feature_dim(self, d):
+        if self.p == 1:
+            return d
+        elif self.p == 2:
+            return int(2 * d + d * (d - 1) / 2)
+
+    def feature_const(self):
+        return self.a ** (self.p / 2)
+
+class ShiftedGaussianKernel:
+    def __init__(self, a, sigma):
+        self.a = a
+        self.sigma = sigma
+
+    def k(self, X1, X2):
+        self.a + np.exp(-cdist(X1, X2, metric="sqeuclidean") / (self.sigma**2))
+
+    def norm_one(self):
+        np.sqrt(1 / self.a)
+
+class ShiftedFirstOrderSobolevKernel:
+    def __init__(self, a):
+        self.a = a
+
+    def k(self, X1, X2):
+        self.a + np.min(X1, X2).sum(axis=1)
+
+    def norm_one(self):
+        np.sqrt(1 / self.a)

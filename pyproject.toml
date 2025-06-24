@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "Upgrading survival models with CARE"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["numpy", "pandas"]
+dependencies = [
+    "numpy",
+ "pandas",
+ "scipy>=1.15.3",
+]
 
 [build-system]
 requires = ["hatchling"]
