@@ -1,5 +1,7 @@
+from care_survival import hello
+
 def main():
-    print("Hello from care-survival!")
+    hello.hello()
 
 if __name__ == "__main__":
     main()
