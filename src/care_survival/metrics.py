@@ -57,8 +57,9 @@ def get_concordance_split(f, embedding, split):
 
 def get_metric_split(f, embedding, metric, split):
     if metric == "ln":
-        return get_ln_split(f, embedding, split)
+        score = get_ln_split(f, embedding, split)
     elif metric == "rmse":
-        return get_rmse_split(f, embedding, split)
+        score = get_rmse_split(f, embedding, split)
     elif metric == "concordance":
-        return get_concordance_split(f, embedding, split)
+        score = get_concordance_split(f, embedding, split)
+    return float(score)

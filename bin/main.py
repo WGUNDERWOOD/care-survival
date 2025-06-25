@@ -2,8 +2,7 @@ import numpy as np
 from care_survival import data as care_data
 from care_survival import kernel as care_kernel
 from care_survival import embedding as care_embedding
-from care_survival import estimator as care_estimator
-from care_survival import validation as care_validation
+from care_survival import selection as care_selection
 
 
 def get_random_data():
@@ -39,8 +38,8 @@ def main():
     embedding = care_embedding.Embedding(
         data_train, data_valid, data_test, kernel, method
     )
-    gamma = 0.5
-    estimator = care_estimator.Estimator(embedding, gamma)
+    # gamma = 0.5
+    # estimator = care_estimator.Estimator(embedding, gamma)
 
     # if method == "kernel":
     # beta = np.random.random(data_train.n)
@@ -48,7 +47,7 @@ def main():
     # beta = np.random.random(embedding.train.feature_dim)
 
     # print(estimator.beta_hat)
-    estimator.optimise(estimator.beta_hat, estimator.inv_hessian_hat)
+    # estimator.optimise(estimator.beta_hat, estimator.inv_hessian_hat)
     # print(estimator.inv_hessian_hat)
     # print(estimator.get_f(estimator.beta_hat, "train"))
     # print(estimator.get_concordance(estimator.beta_hat).valid)
@@ -59,8 +58,12 @@ def main():
     gamma_min = 1e-3
     gamma_max = 1e0
     n_gammas = 3
-    validation = care_validation.Validation(embedding, gamma_min, gamma_max, n_gammas)
-    validation.validate()
+    simplex_resolution = 0.2
+    care = care_selection.CARE(
+        embedding, gamma_min, gamma_max, n_gammas, simplex_resolution
+    )
+    care.fit()
+    print(care.simplex_selections[0].combinations[0].score)
     # print(validation.best.concordance.test)
 
 

@@ -27,7 +27,7 @@ class Combination:
         embedding = self.estimator.embedding
         f = {}
         for split in care_metrics.get_splits():
-            f[split] = self.get_f_check(split)
+            f[split] = self.get_f_check_split(split)
 
         score = {}
         for metric in care_metrics.get_metrics():
@@ -40,14 +40,15 @@ class Combination:
 
 
 class SimplexSelection:
-    def __init__(self, estimator, simplex_dimension, simplex_resolution):
+    def __init__(self, estimator, simplex_resolution):
+        embedding_data = estimator.embedding.data
         self.estimator = estimator
-        self.simplex_dimension = simplex_dimension
+        self.simplex_dimension = np.shape(embedding_data["train"].f_tilde)[1]
         self.simplex_resolution = simplex_resolution
-        self.thetas = get_simplex(simplex_dimension, simplex_resolution)
+        self.thetas = get_simplex(self.simplex_dimension, simplex_resolution)
         self.n_thetas = len(self.thetas)
 
-    def select(self):
+    def fit(self):
         self.combinations = [None for _ in range(self.n_thetas)]
 
         for i in range(self.n_thetas):
@@ -56,10 +57,11 @@ class SimplexSelection:
 
 
 def get_simplex(simplex_dimension, simplex_resolution):
-    n_values = np.ceil(1 / simplex_resolution)
+    n_values = int(np.ceil(1 / simplex_resolution))
     values = [i * simplex_resolution for i in range(n_values)]
     values.append(1)
     values = list(set(values))
     values_rep = [values for _ in range(simplex_dimension)]
     simplex = list(itertools.product(*values_rep))
     simplex = [np.array(s) for s in simplex if np.sum(s) <= 1]
+    return simplex

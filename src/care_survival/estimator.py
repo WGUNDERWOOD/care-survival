@@ -78,10 +78,10 @@ class Estimator:
 
     def optimise(self, beta_init, inv_hessian_init):
         def cost(beta):
-            self.get_lng_split(beta, "train")
+            return self.get_lng_split(beta, "train")
 
         def gradient(beta):
-            self.get_dlng_split(beta, "train")
+            return self.get_dlng_split(beta, "train")
 
         if beta_init is None:
             beta_init = self.embedding.data["train"].get_default_beta()
