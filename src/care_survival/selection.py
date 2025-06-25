@@ -1,19 +1,19 @@
-#use ndarray::Array1;
-#use std::fs::{create_dir_all, File};
-#use std::io::Write;
-#use std::path::Path;
+# use ndarray::Array1;
+# use std::fs::{create_dir_all, File};
+# use std::io::Write;
+# use std::path::Path;
 #
-#use crate::common::Sex;
-#use crate::embedding::Embedding;
-#use crate::estimator::{Estimator, Score};
-#use crate::external::External;
-#use crate::simplex::{get_simplex, SimplexSelection};
-#use crate::validation::{cmp, get_gammas, Best};
+# use crate::common::Sex;
+# use crate::embedding::Embedding;
+# use crate::estimator::{Estimator, Score};
+# use crate::external::External;
+# use crate::simplex::{get_simplex, SimplexSelection};
+# use crate::validation::{cmp, get_gammas, Best};
 #
-#const EPS: f64 = 2.0 * f64::EPSILON;
+# const EPS: f64 = 2.0 * f64::EPSILON;
 #
 ##[derive(Debug)]
-#pub struct ModelSelection<'a> {
+# pub struct ModelSelection<'a> {
 #    pub embedding: &'a Embedding,
 #    pub gamma_min: f64,
 #    pub gamma_max: f64,
@@ -24,9 +24,9 @@
 #    pub externals: &'a [External<'a>],
 #    pub simplex_selections: Vec<SimplexSelection<'a>>,
 #    pub best: Best,
-#}
+# }
 #
-#impl ModelSelection<'_> {
+# impl ModelSelection<'_> {
 #    #[must_use]
 #    pub fn new<'a>(
 #        embedding: &'a Embedding,
@@ -404,10 +404,10 @@
 #            .unwrap();
 #        tilde_score.concordance.test.unwrap()
 #    }
-#}
+# }
 #
 ##[derive(Debug)]
-#pub struct SelectionResults {
+# pub struct SelectionResults {
 #    pub rep: Option<usize>,
 #    pub ns: Vec<usize>,
 #    pub gamma_stars: Vec<f64>,
@@ -421,9 +421,9 @@
 #    pub rmse_daggers: Vec<f64>,
 #    pub rmse_checks: Vec<f64>,
 #    pub rmse_tildes: Vec<f64>,
-#}
+# }
 #
-#impl SelectionResults {
+# impl SelectionResults {
 #    #[must_use]
 #    #[allow(clippy::new_without_default)]
 #    pub fn new() -> Self {
@@ -482,10 +482,10 @@
 #        let mut file = File::create(path).unwrap();
 #        file.write_all(s.as_bytes()).unwrap();
 #    }
-#}
+# }
 #
 ##[derive(Debug)]
-#pub struct Score2SelectionResults {
+# pub struct Score2SelectionResults {
 #    pub model: Option<usize>,
 #    pub sex: Option<Sex>,
 #    pub rep: Option<usize>,
@@ -499,9 +499,9 @@
 #    pub concordance_hats: Vec<f64>,
 #    pub concordance_checks: Vec<f64>,
 #    pub concordance_tildes: Vec<f64>,
-#}
+# }
 #
-#impl Score2SelectionResults {
+# impl Score2SelectionResults {
 #    #[must_use]
 #    #[allow(clippy::new_without_default)]
 #    pub fn new() -> Self {
@@ -560,4 +560,4 @@
 #        let mut file = File::create(path).unwrap();
 #        file.write_all(s.as_bytes()).unwrap();
 #    }
-#}
+# }

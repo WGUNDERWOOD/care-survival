@@ -75,14 +75,18 @@ class EmbeddingData:
 
 class Embedding:
     def __init__(self, data_train, data_valid, data_test, kernel, method):
-        self.train = EmbeddingData(data_train, kernel, method)
-        self.valid = EmbeddingData(data_valid, kernel, method)
-        self.test = EmbeddingData(data_test, kernel, method)
+        self.data = {
+            "train": EmbeddingData(data_train, kernel, method),
+            "valid": EmbeddingData(data_valid, kernel, method),
+            "test": EmbeddingData(data_test, kernel, method),
+        }
 
         if method == "kernel":
             self.K_cent_valid_train = (
-                kernel.k(self.valid.X, self.train.X) - self.train.K_bar
+                kernel.k(self.data["valid"].X, self.data["train"].X)
+                - self.data["train"].K_bar
             )
             self.K_cent_test_train = (
-                kernel.k(self.test.X, self.train.X) - self.train.K_bar
+                kernel.k(self.data["test"].X, self.data["train"].X)
+                - self.data["train"].K_bar
             )
