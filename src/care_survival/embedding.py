@@ -58,6 +58,20 @@ class EmbeddingData:
             self.Phi_bar = np.sum(self.Phi, axis=0) / self.n
             self.Phi_cent = self.Phi - self.Phi_bar
 
+    def get_default_beta(self):
+        if self.method == "kernel":
+            return np.zeros(self.n)
+
+        elif self.method == "feature_map":
+            return np.zeros(self.feature_dim)
+
+    def get_default_inv_hessian(self):
+        if self.method == "kernel":
+            return np.eye(self.n)
+
+        elif self.method == "feature_map":
+            return np.eye(self.feature_dim)
+
 
 class Embedding:
     def __init__(self, data_train, data_valid, data_test, kernel, method):

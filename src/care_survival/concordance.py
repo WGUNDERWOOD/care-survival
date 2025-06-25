@@ -1,10 +1,11 @@
 import numpy as np
 
+
 def get_concordance(f, embedding_data):
     I = embedding_data.I
     n = embedding_data.n
     R = embedding_data.R
-    valid =  1 - I
+    valid = 1 - I
 
     numerator = 0
     for j in np.where(valid)[0]:

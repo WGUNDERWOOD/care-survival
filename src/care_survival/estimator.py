@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.optimize import minimize
+
 from care_survival import score as care_score
 from care_survival import concordance as care_concordance
 
@@ -12,14 +14,11 @@ class Estimator:
         self.n_test = embedding.test.n
         self.method = embedding.train.method
 
-        if self.method == "kernel":
-            self.beta_hat = np.zeros(self.n_train)
-            self.inv_hessian_hat = np.eye(self.n_train)
-
-        elif self.method == "feature_map":
+        if self.method == "feature_map":
             self.feature_dim = embedding.train.feature_dim
-            self.beta_hat = np.zeros(self.feature_dim)
-            self.inv_hessian_hat = np.eye(self.feature_dim)
+
+        self.beta_hat = self.embedding.train.get_default_beta()
+        self.inv_hessian_hat = self.embedding.train.get_default_inv_hessian()
 
     def get_f(self, beta, split):
         embedding = self.embedding
@@ -88,7 +87,7 @@ class Estimator:
         lng_train = self.get_lng_split(beta, "train")
         lng_valid = self.get_lng_split(beta, "valid")
         lng_test = self.get_lng_split(beta, "test")
-        return ScoreSplit(lng_train, lng_valid, lng_test)
+        return care_score.ScoreSplit(lng_train, lng_valid, lng_test)
 
     def get_dlng_split(self, beta, split):
         if split == "train":
@@ -145,9 +144,13 @@ class Estimator:
 
     def get_concordance(self, beta):
         f_train = self.get_f(beta, "train")
-        concordance_train = care_concordance.get_concordance(f_train, self.embedding.train)
+        concordance_train = care_concordance.get_concordance(
+            f_train, self.embedding.train
+        )
         f_valid = self.get_f(beta, "valid")
-        concordance_valid = care_concordance.get_concordance(f_valid, self.embedding.valid)
+        concordance_valid = care_concordance.get_concordance(
+            f_valid, self.embedding.valid
+        )
         f_test = self.get_f(beta, "test")
         concordance_test = care_concordance.get_concordance(f_test, self.embedding.test)
         return care_score.ScoreSplit(
@@ -161,6 +164,19 @@ class Estimator:
         concordance = self.get_concordance(beta)
         return care_score.Score(ln, lng, rmse, concordance)
 
+    def optimise(self, beta_init, inv_hessian_init):
+        cost = lambda beta: self.get_lng_split(beta, "train")
+        gradient = lambda beta: self.get_dlng_split(beta, "train")
+        gtol = 1e-6
+        res = minimize(cost, beta_init, method="BFGS", jac=gradient,
+                 options={"hess_inv0": inv_hessian_init, "gtol": gtol})
+
+        self.beta_hat = res.x
+        self.inv_hessian_hat = res.hess_inv
+        self.f_hat_train = self.get_f(self.beta_hat, "train")
+        self.f_hat_valid = self.get_f(self.beta_hat, "valid")
+        self.f_hat_test = self.get_f(self.beta_hat, "test")
+        self.score = self.get_score(self.beta_hat)
 
 def expt(f, f_max):
     return np.exp(f - f_max)

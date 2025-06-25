@@ -47,8 +47,10 @@ def main():
         beta = np.random.random(embedding.train.feature_dim)
 
     # print(estimator.beta_hat)
+    estimator.optimise(estimator.beta_hat, estimator.inv_hessian_hat)
+    # print(estimator.inv_hessian_hat)
     # print(estimator.get_f(estimator.beta_hat, "train"))
-    print(estimator.get_concordance(estimator.beta_hat).valid)
+    #print(estimator.get_concordance(estimator.beta_hat).valid)
     # print(embed.train.K)
     # print(embed.train.Phi)
     # print(data.f_0)
