@@ -1,7 +1,7 @@
 import numpy as np
 
-class Data:
 
+class Data:
     def __init__(self, X, T, I, f_tilde, f_0):
         self.n = np.shape(X)[0]
         self.d = np.shape(X)[1]
