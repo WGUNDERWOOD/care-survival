@@ -6,7 +6,7 @@ from care_survival import selection as care_selection
 
 
 def get_random_data():
-    #n = 30
+    # n = 30
     n = 1000
     d = 5
     m = 1

@@ -1,5 +1,4 @@
 import numpy as np
-from datetime import datetime
 import itertools
 
 from care_survival import metrics as care_metrics

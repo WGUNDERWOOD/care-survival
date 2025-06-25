@@ -1,5 +1,4 @@
 import numpy as np
-from datetime import datetime
 
 from care_survival import estimator as care_estimator
 
