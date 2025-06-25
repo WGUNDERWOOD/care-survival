@@ -3,10 +3,11 @@ from care_survival import data as care_data
 from care_survival import kernel as care_kernel
 from care_survival import embedding as care_embedding
 from care_survival import estimator as care_estimator
+from care_survival import validation as care_validation
 
 
 def get_random_data():
-    n = 6
+    n = 30
     # n = 100
     d = 3
     m = 2
@@ -50,10 +51,17 @@ def main():
     estimator.optimise(estimator.beta_hat, estimator.inv_hessian_hat)
     # print(estimator.inv_hessian_hat)
     # print(estimator.get_f(estimator.beta_hat, "train"))
-    #print(estimator.get_concordance(estimator.beta_hat).valid)
+    # print(estimator.get_concordance(estimator.beta_hat).valid)
     # print(embed.train.K)
     # print(embed.train.Phi)
     # print(data.f_0)
+
+    gamma_min = 1e-3
+    gamma_max = 1e0
+    n_gammas = 3
+    validation = care_validation.Validation(embedding, gamma_min, gamma_max, n_gammas)
+    validation.validate()
+    #print(validation.best.concordance.test)
 
 
 if __name__ == "__main__":

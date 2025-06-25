@@ -168,15 +168,21 @@ class Estimator:
         cost = lambda beta: self.get_lng_split(beta, "train")
         gradient = lambda beta: self.get_dlng_split(beta, "train")
         gtol = 1e-6
-        res = minimize(cost, beta_init, method="BFGS", jac=gradient,
-                 options={"hess_inv0": inv_hessian_init, "gtol": gtol})
+        res = minimize(
+            cost,
+            beta_init,
+            method="BFGS",
+            jac=gradient,
+            options={"hess_inv0": inv_hessian_init, "gtol": gtol},
+        )
 
         self.beta_hat = res.x
-        self.inv_hessian_hat = res.hess_inv
+        self.inv_hessian_hat = (res.hess_inv + res.hess_inv.T) / 2
         self.f_hat_train = self.get_f(self.beta_hat, "train")
         self.f_hat_valid = self.get_f(self.beta_hat, "valid")
         self.f_hat_test = self.get_f(self.beta_hat, "test")
         self.score = self.get_score(self.beta_hat)
+
 
 def expt(f, f_max):
     return np.exp(f - f_max)
