@@ -42,10 +42,10 @@ def main():
     gamma = 0.5
     estimator = care_estimator.Estimator(embedding, gamma)
 
-    if method == "kernel":
-        beta = np.random.random(data_train.n)
-    elif method == "feature_map":
-        beta = np.random.random(embedding.train.feature_dim)
+    # if method == "kernel":
+    # beta = np.random.random(data_train.n)
+    # elif method == "feature_map":
+    # beta = np.random.random(embedding.train.feature_dim)
 
     # print(estimator.beta_hat)
     estimator.optimise(estimator.beta_hat, estimator.inv_hessian_hat)

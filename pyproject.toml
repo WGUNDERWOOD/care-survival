@@ -21,3 +21,6 @@ index-strategy = "unsafe-best-match"
 name = "testpypi"
 url = "https://test.pypi.org/simple/"
 publish-url = "https://test.pypi.org/legacy/"
+
+[tool.ruff.lint]
+ignore = ["E741"]
