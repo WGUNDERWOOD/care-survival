@@ -66,5 +66,9 @@ class Embedding:
         self.test = EmbeddingData(data_test, kernel, method)
 
         if method == "kernel":
-            self.K_cent_valid_train = kernel.k(self.valid.X, self.train.X) - train.K_bar
-            self.K_cent_test_train = kernel.k(self.test.X, self.train.X) - train.K_bar
+            self.K_cent_valid_train = (
+                kernel.k(self.valid.X, self.train.X) - self.train.K_bar
+            )
+            self.K_cent_test_train = (
+                kernel.k(self.test.X, self.train.X) - self.train.K_bar
+            )

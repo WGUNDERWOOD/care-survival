@@ -71,7 +71,9 @@ class ShiftedFirstOrderSobolevKernel:
         self.a = a
 
     def k(self, X1, X2):
-        return self.a + np.min(X1, X2).sum(axis=1)
+        return self.a + np.sum(
+            np.minimum(X1[:, np.newaxis, :], X2[np.newaxis, :, :]), axis=2
+        )
 
     def norm_one(self):
         return np.sqrt(1 / self.a)
