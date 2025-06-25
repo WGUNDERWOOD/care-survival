@@ -2,6 +2,7 @@ import numpy as np
 
 from care_survival import simplex as care_simplex
 from care_survival import estimator as care_estimator
+from care_survival import metrics as care_metrics
 
 
 class CARE:
@@ -33,6 +34,25 @@ class CARE:
             )
             simplex_selection.fit()
             self.simplex_selections[i] = simplex_selection
+
+        self.best = {}
+        for metric in care_metrics.get_metrics():
+            self.best[metric] = {}
+            for split in care_metrics.get_splits():
+                self.best[metric][split] = self.best_by(metric, split)
+
+    def best_by(self, metric, split):
+        scores = [
+            c
+            for s in self.simplex_selections
+            for c in s.combinations
+            if c.score[metric][split] is not None
+        ]
+
+        def key(c):
+            return c.score[metric][split]
+
+        return min(scores, key=key)
 
 
 def get_gammas(gamma_min, gamma_max, n_gammas):

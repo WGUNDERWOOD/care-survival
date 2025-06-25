@@ -19,9 +19,12 @@ def get_random_data():
 
 
 def main():
+    # data
     data_train = get_random_data()
     data_valid = get_random_data()
     data_test = get_random_data()
+
+    # kernel
     a = 1
     p = 2
     # sigma = 0.5
@@ -29,32 +32,16 @@ def main():
     # kernel = care_kernel.ShiftedGaussianKernel(a, sigma)
     # kernel = care_kernel.ShiftedFirstOrderSobolevKernel(a)
 
-    # print(data.X)
-    # print(kernel.k(data.X, data.X))
-    # print(kernel.norm_one())
-    # print(kernel.phi(data.X).shape)
+    # optimisation method
     # method = "kernel"
     method = "feature_map"
+
+    # kernel/feature embedding
     embedding = care_embedding.Embedding(
         data_train, data_valid, data_test, kernel, method
     )
-    # gamma = 0.5
-    # estimator = care_estimator.Estimator(embedding, gamma)
 
-    # if method == "kernel":
-    # beta = np.random.random(data_train.n)
-    # elif method == "feature_map":
-    # beta = np.random.random(embedding.train.feature_dim)
-
-    # print(estimator.beta_hat)
-    # estimator.optimise(estimator.beta_hat, estimator.inv_hessian_hat)
-    # print(estimator.inv_hessian_hat)
-    # print(estimator.get_f(estimator.beta_hat, "train"))
-    # print(estimator.get_concordance(estimator.beta_hat).valid)
-    # print(embed.train.K)
-    # print(embed.train.Phi)
-    # print(data.f_0)
-
+    # fit CARE
     gamma_min = 1e-3
     gamma_max = 1e0
     n_gammas = 3
@@ -63,9 +50,10 @@ def main():
         embedding, gamma_min, gamma_max, n_gammas, simplex_resolution
     )
     care.fit()
-    print(care.simplex_selections[0].combinations[0].score)
-    # print(validation.best.concordance.test)
-
+    best = care.best["ln"]["test"]
+    print(best.estimator.gamma)
+    print(best.theta)
+    print(best.score["ln"]["test"])
 
 if __name__ == "__main__":
     main()
