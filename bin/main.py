@@ -2,6 +2,7 @@ import numpy as np
 from care_survival import data as care_data
 from care_survival import kernel as care_kernel
 from care_survival import embedding as care_embedding
+from care_survival import estimator as care_estimator
 
 
 def get_random_data():
@@ -34,7 +35,20 @@ def main():
     # print(kernel.phi(data.X).shape)
     # method = "kernel"
     method = "feature_map"
-    embed = care_embedding.Embedding(data_train, data_valid, data_test, kernel, method)
+    embedding = care_embedding.Embedding(
+        data_train, data_valid, data_test, kernel, method
+    )
+    gamma = 0.5
+    estimator = care_estimator.Estimator(embedding, gamma)
+
+    if method == "kernel":
+        beta = np.random.random(data_train.n)
+    elif method == "feature_map":
+        beta = np.random.random(embedding.train.feature_dim)
+
+    # print(estimator.beta_hat)
+    # print(estimator.get_f(estimator.beta_hat, "train"))
+    print(estimator.get_dlng_split(estimator.beta_hat, "train"))
     # print(embed.train.K)
     # print(embed.train.Phi)
     # print(data.f_0)
