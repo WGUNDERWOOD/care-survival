@@ -6,10 +6,10 @@ from care_survival import selection as care_selection
 
 
 def get_random_data():
-    n = 30
-    # n = 100
-    d = 3
-    m = 2
+    #n = 30
+    n = 1000
+    d = 5
+    m = 1
     X = np.random.random((n, d))
     T = np.random.random(n)
     I = np.random.randint(0, 2, size=n)
@@ -44,8 +44,9 @@ def main():
     # fit CARE
     gamma_min = 1e-3
     gamma_max = 1e0
-    n_gammas = 3
-    simplex_resolution = 0.2
+    # TODO this breaks with n_gammas = 1
+    n_gammas = 2
+    simplex_resolution = 0.5
     care = care_selection.CARE(
         embedding, gamma_min, gamma_max, n_gammas, simplex_resolution
     )
@@ -54,6 +55,7 @@ def main():
     print(best.estimator.gamma)
     print(best.theta)
     print(best.score["ln"]["test"])
+
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,5 @@
 import numpy as np
+from datetime import datetime
 
 from care_survival import estimator as care_estimator
 
@@ -36,17 +37,21 @@ def get_rmse_split(f, embedding, split):
 
 
 def get_concordance_split(f, embedding, split):
+    # NOTE for speed
+    if split != "test":
+        return np.inf
+
     embedding_data = embedding.data[split]
     I = embedding_data.I
     n = embedding_data.n
     R = embedding_data.R
     valid = 1 - I
 
+    # NOTE this is slow
     numerator = 0
     for j in np.where(valid)[0]:
         i_range = np.arange(R[j], n).astype(int)
-        i_mask = (f[i_range] < f[j]) & (i_range != j)
-        numerator += np.sum(i_mask)
+        numerator += np.sum((f[i_range] < f[j]) & (i_range != j))
 
     denominator = np.sum((n - R - 1) * valid)
     if denominator > 0:

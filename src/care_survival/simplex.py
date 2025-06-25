@@ -1,4 +1,5 @@
 import numpy as np
+from datetime import datetime
 import itertools
 
 from care_survival import metrics as care_metrics
@@ -50,7 +51,6 @@ class SimplexSelection:
 
     def fit(self):
         self.combinations = [None for _ in range(self.n_thetas)]
-
         for i in range(self.n_thetas):
             theta = self.thetas[i]
             self.combinations[i] = Combination(self.estimator, theta)

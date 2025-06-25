@@ -89,6 +89,7 @@ class Estimator:
             inv_hessian_init = self.embedding.data["train"].get_default_inv_hessian()
 
         gtol = 1e-6
+        #print("Starting BFGS")
         res = minimize(
             cost,
             beta_init,
@@ -96,6 +97,7 @@ class Estimator:
             jac=gradient,
             options={"hess_inv0": inv_hessian_init, "gtol": gtol},
         )
+        #print("Finished BFGS")
 
         self.beta_hat = res.x
         self.inv_hessian_hat = (res.hess_inv + res.hess_inv.T) / 2
