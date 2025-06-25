@@ -1,5 +1,6 @@
 import numpy as np
 from care_survival import score as care_score
+from care_survival import concordance as care_concordance
 
 
 class Estimator:
@@ -144,11 +145,11 @@ class Estimator:
 
     def get_concordance(self, beta):
         f_train = self.get_f(beta, "train")
-        concordance_train = get_concordance(f_train, self.embedding.train)
+        concordance_train = care_concordance.get_concordance(f_train, self.embedding.train)
         f_valid = self.get_f(beta, "valid")
-        concordance_valid = get_concordance(f_valid, self.embedding.valid)
+        concordance_valid = care_concordance.get_concordance(f_valid, self.embedding.valid)
         f_test = self.get_f(beta, "test")
-        concordance_test = get_concordance(f_test, self.embedding.test)
+        concordance_test = care_concordance.get_concordance(f_test, self.embedding.test)
         return care_score.ScoreSplit(
             concordance_train, concordance_valid, concordance_test
         )
