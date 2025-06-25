@@ -41,6 +41,7 @@ class CARE:
             for split in care_metrics.get_splits():
                 self.best[metric][split] = self.best_by(metric, split)
 
+    # TODO this needs also top-level kernel/external/care identifier
     def best_by(self, metric, split):
         scores = [
             c
@@ -53,6 +54,28 @@ class CARE:
             return c.score[metric][split]
 
         return min(scores, key=key)
+
+    # TODO implement this
+    # def summarise(self):
+    # return {
+    # "n": self.n,
+    # "gamma_star": self.best["rmse"]["test"]
+    # }
+
+
+#            rep: None,
+#            ns: vec![],
+#            gamma_stars: vec![],
+#            gamma_hats: vec![],
+#            gamma_daggers: vec![],
+#            gamma_checks: vec![],
+#            theta_daggers: vec![],
+#            theta_checks: vec![],
+#            rmse_stars: vec![],
+#            rmse_hats: vec![],
+#            rmse_daggers: vec![],
+#            rmse_checks: vec![],
+#            rmse_tildes: vec![],
 
 
 def get_gammas(gamma_min, gamma_max, n_gammas):
