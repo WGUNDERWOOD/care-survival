@@ -125,21 +125,13 @@ class Estimator:
                 - 2 * self.gamma * Phi_bar * beta_0 / feature_const
             )
 
-    def get_rmse_split(self, beta, split):
-        f = self.get_f(beta, split)
-        embedding = self.embedding
-
-        if split == "train":
-            return get_rmse(f, embedding.train.f_0)
-        elif split == "valid":
-            return get_rmse(f, embedding.valid.f_0)
-        elif split == "test":
-            return get_rmse(f, embedding.test.f_0)
-
     def get_rmse(self, beta):
-        rmse_train = self.get_rmse_split(beta, "train")
-        rmse_valid = self.get_rmse_split(beta, "valid")
-        rmse_test = self.get_rmse_split(beta, "test")
+        f_train = self.get_f(beta, "train")
+        rmse_train = get_rmse(f_train, self.embedding.train.f_0)
+        f_valid = self.get_f(beta, "valid")
+        rmse_valid = get_rmse(f_valid, self.embedding.valid.f_0)
+        f_test = self.get_f(beta, "test")
+        rmse_test = get_rmse(f_test, self.embedding.test.f_0)
         return care_score.ScoreSplit(rmse_train, rmse_valid, rmse_test)
 
     def get_concordance(self, beta):
