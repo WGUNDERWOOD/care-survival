@@ -61,7 +61,7 @@ def main():
     n_gammas = 3
     validation = care_validation.Validation(embedding, gamma_min, gamma_max, n_gammas)
     validation.validate()
-    #print(validation.best.concordance.test)
+    # print(validation.best.concordance.test)
 
 
 if __name__ == "__main__":

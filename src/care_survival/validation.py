@@ -2,6 +2,7 @@ import numpy as np
 
 from care_survival import estimator as care_estimator
 
+
 class Validation:
     def __init__(self, embedding, gamma_min, gamma_max, n_gammas):
         self.embedding = embedding
@@ -46,6 +47,7 @@ class Validation:
 def get_gammas(gamma_min, gamma_max, n_gammas):
     ratio = (gamma_max / gamma_min) ** (1 / (n_gammas - 1))
     return [gamma_min * ratio**i for i in reversed(range(n_gammas))]
+
 
 class BestSplit:
     def __init__(self, train, valid, test):
