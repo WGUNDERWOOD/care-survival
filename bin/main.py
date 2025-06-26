@@ -8,8 +8,8 @@ from care_survival import aggregation as care_aggregation
 
 
 def get_random_data():
-    # n = 30
-    n = 1000
+    n = 5
+    # n = 1000
     d = 5
     m = 1
     X = np.random.random((n, d))
@@ -46,7 +46,6 @@ def main():
     # fit CARE
     gamma_min = 1e-3
     gamma_max = 1e0
-    # TODO this breaks with n_gammas = 1
     n_gammas = 2
     simplex_resolution = 0.5
     care = care_aggregation.CARE(

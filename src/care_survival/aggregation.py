@@ -50,11 +50,7 @@ class CARE:
         self.summarise()
 
     def best_by(self, model, metric, split):
-        cs = [
-            c
-            for c in self.convex_estimators
-            if c.score[metric][split] is not None
-        ]
+        cs = [c for c in self.convex_estimators if c.score[metric][split] is not None]
 
         if model == "kernel":
             cs = [c for c in cs if np.sum(c.theta) == 0]
@@ -92,8 +88,13 @@ class CARE:
 
 
 def get_gammas(gamma_min, gamma_max, n_gammas):
-    ratio = (gamma_max / gamma_min) ** (1 / (n_gammas - 1))
-    return [gamma_min * ratio**i for i in reversed(range(n_gammas))]
+    if n_gammas == 1:
+        assert gamma_min == gamma_max, "if n_gammas = 1, gamma_min must equal gamma_max"
+        return [gamma_min]
+    else:
+        ratio = (gamma_max / gamma_min) ** (1 / (n_gammas - 1))
+        return [gamma_min * ratio**i for i in reversed(range(n_gammas))]
+
 
 def get_simplex(simplex_dimension, simplex_resolution):
     n_values = int(np.ceil(1 / simplex_resolution))

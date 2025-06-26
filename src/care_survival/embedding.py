@@ -15,26 +15,21 @@ class EmbeddingData:
         self.N = 1 - self.I
 
         # R
-        # TODO check this agrees with Rust
-        self.R = np.zeros(data.n)
+        self.R = np.zeros(self.n)
         R_prev = 0
-        for j in range(data.n):
-            candidates = np.arange(R_prev, j + 1)
-            mask = data.T[candidates] >= data.T[j]
-            R_val = candidates[np.argmax(mask)]
-            self.R[j] = R_val
-            R_prev = R_val
+        for j in range(self.n):
+            R_prev += np.argmax(self.T[R_prev : (j + 1)] >= self.T[j])
+            self.R[j] = R_prev
 
         # Z
-        # TODO check this agrees with Rust
-        self.Z = np.zeros(data.n)
-        Z_prev = data.n
+        self.Z = np.zeros(self.n)
+        Z_prev = data.n - 1
         for i in reversed(range(data.n)):
-            candidates = np.arange(i, Z_prev)
-            mask = data.T[i] >= data.T[candidates]
-            Z_val = candidates[mask][-1]
-            self.Z[i] = Z_val
-            Z_prev = Z_val
+            if i == 0:
+                Z_prev -= np.argmax(self.T[Z_prev::-1] <= self.T[i])
+            else:
+                Z_prev -= np.argmax(self.T[Z_prev : i - 1 : -1] <= self.T[i])
+            self.Z[i] = Z_prev
 
         self.R_bar = (self.n - self.R) / self.n
         self.ln_cent = np.sum(np.log(self.R_bar) * self.N) / self.n
@@ -58,6 +53,8 @@ class EmbeddingData:
             self.Phi_bar = np.sum(self.Phi, axis=0) / self.n
             self.Phi_tilde = self.Phi - self.Phi_bar
 
+        self.breslow = self.get_breslow()
+
     def get_default_beta(self):
         if self.method == "kernel":
             return np.zeros(self.n)
@@ -71,6 +68,13 @@ class EmbeddingData:
 
         elif self.method == "feature_map":
             return np.eye(self.feature_dim)
+
+    def get_breslow(self):
+        n = self.n
+        N_over_R = self.N / (self.R_bar * n)
+        cumulative_sum = np.cumsum(N_over_R)
+        p = cumulative_sum[self.Z.astype(int)]
+        return np.exp(-p)
 
 
 class Embedding:
