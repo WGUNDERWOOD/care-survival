@@ -1,4 +1,6 @@
 import numpy as np
+import pprint
+
 from care_survival import data as care_data
 from care_survival import kernel as care_kernel
 from care_survival import embedding as care_embedding
@@ -51,10 +53,12 @@ def main():
         embedding, gamma_min, gamma_max, n_gammas, simplex_resolution
     )
     care.fit()
-    best = care.best["ln"]["test"]
-    print(best.estimator.gamma)
-    print(best.theta)
-    print(best.score["ln"]["test"])
+    best = care.best["aggregated"]["ln"]["test"]
+    # print(best.estimator.gamma)
+    # print(best.theta)
+    # print(best.score["ln"]["test"])
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(care.summary)
 
 
 if __name__ == "__main__":

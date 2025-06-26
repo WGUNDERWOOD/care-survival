@@ -16,14 +16,14 @@ class Estimator:
     def get_f(self, beta, split):
         if self.method == "kernel":
             if split == "valid":
-                matrix = self.embedding.K_cent_valid_train
+                matrix = self.embedding.K_tilde_valid_train
             elif split == "test":
-                matrix = self.embedding.K_cent_test_train
+                matrix = self.embedding.K_tilde_test_train
             else:
-                matrix = self.embedding.data[split].K_cent
+                matrix = self.embedding.data[split].K_tilde
 
         elif self.method == "feature_map":
-            matrix = self.embedding.data[split].Phi_cent
+            matrix = self.embedding.data[split].Phi_tilde
 
         return matrix @ beta
 
@@ -58,20 +58,20 @@ class Estimator:
         N = embedding_data.N
 
         if self.method == "kernel":
-            K_cent = embedding_data.K_cent
+            K_tilde = embedding_data.K_tilde
             K_hat = embedding_data.K_hat
             return np.sum(
-                (Dsn.T / sn - K_cent.T) * N / n + 2 * self.gamma * K_hat.T * beta,
+                (Dsn.T / sn - K_tilde.T) * N / n + 2 * self.gamma * K_hat.T * beta,
                 axis=1,
             )
 
         elif self.method == "feature_map":
-            Phi_cent = embedding_data.Phi_cent
+            Phi_tilde = embedding_data.Phi_tilde
             Phi_bar = embedding_data.Phi_bar
             feature_const = embedding_data.feature_const
             beta_0 = -beta @ Phi_bar / feature_const
             return (
-                np.sum((Dsn.T / sn - Phi_cent.T) * N / n, axis=1)
+                np.sum((Dsn.T / sn - Phi_tilde.T) * N / n, axis=1)
                 + 2 * self.gamma * beta
                 - 2 * self.gamma * Phi_bar * beta_0 / feature_const
             )
@@ -123,13 +123,13 @@ def get_Dsn(embedding_data, f_expt):
     R = embedding_data.R.astype(int)
 
     if embedding_data.method == "kernel":
-        K_cent = embedding_data.K_cent
+        K_tilde = embedding_data.K_tilde
         counter = np.array(np.arange(n))
         A = (R.reshape(-1, 1) <= counter) * f_expt / n
-        return A @ K_cent
+        return A @ K_tilde
 
     elif embedding_data.method == "feature_map":
-        Phi_cent = embedding_data.Phi_cent
-        A = Phi_cent * f_expt.reshape(-1, 1)
+        Phi_tilde = embedding_data.Phi_tilde
+        A = Phi_tilde * f_expt.reshape(-1, 1)
         B = np.cumsum(A[::-1, :], axis=0) / n
         return B[n - R - 1, :]

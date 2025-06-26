@@ -43,7 +43,7 @@ class EmbeddingData:
             self.norm_one = kernel.norm_one()
             self.K = kernel.k(self.X, self.X)
             self.K_bar = np.sum(self.K, axis=0) / self.n
-            self.K_cent = self.K - self.K_bar
+            self.K_tilde = self.K - self.K_bar
             self.K_hat = (
                 self.K
                 - self.K_bar
@@ -56,7 +56,7 @@ class EmbeddingData:
             self.feature_const = kernel.feature_const()
             self.Phi = kernel.phi(self.X)
             self.Phi_bar = np.sum(self.Phi, axis=0) / self.n
-            self.Phi_cent = self.Phi - self.Phi_bar
+            self.Phi_tilde = self.Phi - self.Phi_bar
 
     def get_default_beta(self):
         if self.method == "kernel":
@@ -82,11 +82,11 @@ class Embedding:
         }
 
         if method == "kernel":
-            self.K_cent_valid_train = (
+            self.K_tilde_valid_train = (
                 kernel.k(self.data["valid"].X, self.data["train"].X)
                 - self.data["train"].K_bar
             )
-            self.K_cent_test_train = (
+            self.K_tilde_test_train = (
                 kernel.k(self.data["test"].X, self.data["train"].X)
                 - self.data["train"].K_bar
             )
