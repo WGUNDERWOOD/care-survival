@@ -4,9 +4,9 @@ import itertools
 from care_survival import metrics as care_metrics
 
 
-class Combination:
-    def __init__(self, estimator, theta):
-        self.estimator = estimator
+class ConvexEstimator:
+    def __init__(self, kernel_estimator, theta):
+        self.kernel_estimator = kernel_estimator
         self.theta = theta
         self.simplex_dimension = len(theta)
         self.f_check = {}
@@ -17,14 +17,14 @@ class Combination:
     def get_f_check_split(self, split):
         theta = self.theta
         theta_0 = 1.0 - np.sum(theta)
-        f_check = theta_0 * self.estimator.f_hat[split]
-        embedding_data = self.estimator.embedding.data
+        f_check = theta_0 * self.kernel_estimator.f_hat[split]
+        embedding_data = self.kernel_estimator.embedding.data
         for i in range(self.simplex_dimension):
             f_check = f_check + theta[i] * embedding_data[split].f_tilde[:, i]
         return f_check
 
     def get_score(self):
-        embedding = self.estimator.embedding
+        embedding = self.kernel_estimator.embedding
         f = {}
         for split in care_metrics.get_splits():
             f[split] = self.get_f_check_split(split)
@@ -40,19 +40,21 @@ class Combination:
 
 
 class SimplexSelection:
-    def __init__(self, estimator, simplex_resolution):
-        embedding_data = estimator.embedding.data
-        self.estimator = estimator
+    def __init__(self, kernel_estimator, simplex_resolution):
+        embedding_data = kernel_estimator.embedding.data
+        self.kernel_estimator = kernel_estimator
         self.simplex_dimension = np.shape(embedding_data["train"].f_tilde)[1]
         self.simplex_resolution = simplex_resolution
         self.thetas = get_simplex(self.simplex_dimension, simplex_resolution)
         self.n_thetas = len(self.thetas)
 
     def fit(self):
-        self.combinations = [None for _ in range(self.n_thetas)]
+        self.convex_estimators = [None for _ in range(self.n_thetas)]
         for i in range(self.n_thetas):
             theta = self.thetas[i]
-            self.combinations[i] = Combination(self.estimator, theta)
+            self.convex_estimators[i] = ConvexEstimator(
+                self.kernel_estimator, theta
+            )
 
 
 def get_simplex(simplex_dimension, simplex_resolution):

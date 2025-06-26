@@ -1,6 +1,6 @@
 import numpy as np
 
-from care_survival import estimator as care_estimator
+from care_survival import kernel_estimator as care_kernel_estimator
 
 
 def get_splits():
@@ -19,8 +19,8 @@ def get_ln_split(f, embedding, split):
     embedding_data = embedding.data[split]
     n = embedding_data.n
     f_max = np.max(f)
-    f_expt = care_estimator.expt(f, f_max)
-    sn = care_estimator.get_sn(embedding_data, f_expt)
+    f_expt = care_kernel_estimator.expt(f, f_max)
+    sn = care_kernel_estimator.get_sn(embedding_data, f_expt)
     N = embedding_data.N
     ln_cent = embedding_data.ln_cent
 

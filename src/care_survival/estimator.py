@@ -4,7 +4,7 @@ from scipy.optimize import minimize
 from care_survival import metrics as care_metrics
 
 
-class Estimator:
+class KernelEstimator:
     def __init__(self, embedding, gamma):
         self.embedding = embedding
         self.gamma = gamma
@@ -76,7 +76,7 @@ class Estimator:
                 - 2 * self.gamma * Phi_bar * beta_0 / feature_const
             )
 
-    def optimise(self, beta_init, inv_hessian_init):
+    def fit(self, beta_init, inv_hessian_init):
         def cost(beta):
             return self.get_lng_split(beta, "train")
 
@@ -89,7 +89,6 @@ class Estimator:
             inv_hessian_init = self.embedding.data["train"].get_default_inv_hessian()
 
         gtol = 1e-6
-        # print("Starting BFGS")
         res = minimize(
             cost,
             beta_init,
@@ -97,7 +96,6 @@ class Estimator:
             jac=gradient,
             options={"hess_inv0": inv_hessian_init, "gtol": gtol},
         )
-        # print("Finished BFGS")
 
         self.beta_hat = res.x
         self.inv_hessian_hat = (res.hess_inv + res.hess_inv.T) / 2

@@ -2,7 +2,7 @@ import numpy as np
 import pprint
 
 from care_survival import data as care_data
-from care_survival import kernel as care_kernel
+from care_survival import kernels as care_kernels
 from care_survival import embedding as care_embedding
 from care_survival import selection as care_selection
 
@@ -30,9 +30,9 @@ def main():
     a = 1
     p = 2
     # sigma = 0.5
-    kernel = care_kernel.PolynomialKernel(a, p)
-    # kernel = care_kernel.ShiftedGaussianKernel(a, sigma)
-    # kernel = care_kernel.ShiftedFirstOrderSobolevKernel(a)
+    kernel = care_kernels.PolynomialKernel(a, p)
+    # kernel = care_kernels.ShiftedGaussianKernel(a, sigma)
+    # kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
 
     # optimisation method
     # method = "kernel"
@@ -53,8 +53,7 @@ def main():
         embedding, gamma_min, gamma_max, n_gammas, simplex_resolution
     )
     care.fit()
-    best = care.best["aggregated"]["ln"]["test"]
-    # print(best.estimator.gamma)
+    # best = care.best["aggregated"]["ln"]["test"]
     # print(best.theta)
     # print(best.score["ln"]["test"])
     pp = pprint.PrettyPrinter(indent=4)

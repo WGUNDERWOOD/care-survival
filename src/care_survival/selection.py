@@ -1,7 +1,7 @@
 import numpy as np
 
 from care_survival import simplex as care_simplex
-from care_survival import estimator as care_estimator
+from care_survival import kernel_estimator as care_kernel_estimator
 from care_survival import metrics as care_metrics
 
 
@@ -25,12 +25,14 @@ class CARE:
 
         for i in range(self.n_gammas):
             gamma = self.gammas[i]
-            estimator = care_estimator.Estimator(self.embedding, gamma)
-            estimator.optimise(beta_hat, inv_hessian_hat)
-            inv_hessian_hat = estimator.inv_hessian_hat
-            beta_hat = estimator.beta_hat
+            kernel_estimator = care_kernel_estimator.KernelEstimator(
+                self.embedding, gamma
+            )
+            kernel_estimator.fit(beta_hat, inv_hessian_hat)
+            inv_hessian_hat = kernel_estimator.inv_hessian_hat
+            beta_hat = kernel_estimator.beta_hat
             simplex_selection = care_simplex.SimplexSelection(
-                estimator, self.simplex_resolution
+                kernel_estimator, self.simplex_resolution
             )
             simplex_selection.fit()
             self.simplex_selections[i] = simplex_selection
@@ -46,22 +48,22 @@ class CARE:
         self.summarise()
 
     def best_by(self, model, metric, split):
-        combs = [
+        cs = [
             c
             for s in self.simplex_selections
-            for c in s.combinations
+            for c in s.convex_estimators
             if c.score[metric][split] is not None
         ]
 
         if model == "kernel":
-            combs = [c for c in combs if np.sum(c.theta) == 0]
+            cs = [c for c in cs if np.sum(c.theta) == 0]
         elif model == "external":
-            combs = [c for c in combs if np.any(c.theta == 1)]
+            cs = [c for c in cs if np.any(c.theta == 1)]
 
         def key(c):
             return c.score[metric][split]
 
-        return min(combs, key=key)
+        return min(cs, key=key)
 
     def summarise(self):
         star = self.best["kernel"]["l2"]["test"]
@@ -74,10 +76,10 @@ class CARE:
             "n_train": self.embedding.data["train"].n,
             "n_valid": self.embedding.data["valid"].n,
             "n_test": self.embedding.data["test"].n,
-            "gamma_star": star.estimator.gamma,
-            "gamma_hat": hat.estimator.gamma,
-            "gamma_dagger": dagger.estimator.gamma,
-            "gamma_check": check.estimator.gamma,
+            "gamma_star": star.kernel_estimator.gamma,
+            "gamma_hat": hat.kernel_estimator.gamma,
+            "gamma_dagger": dagger.kernel_estimator.gamma,
+            "gamma_check": check.kernel_estimator.gamma,
             "theta_dagger": dagger.theta,
             "theta_check": check.theta,
             "l2_star": star.score["l2"]["test"],
