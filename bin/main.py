@@ -4,7 +4,7 @@ import pprint
 from care_survival import data as care_data
 from care_survival import kernels as care_kernels
 from care_survival import embedding as care_embedding
-from care_survival import selection as care_selection
+from care_survival import aggregation as care_aggregation
 
 
 def get_random_data():
@@ -49,7 +49,7 @@ def main():
     # TODO this breaks with n_gammas = 1
     n_gammas = 2
     simplex_resolution = 0.5
-    care = care_selection.CARE(
+    care = care_aggregation.CARE(
         embedding, gamma_min, gamma_max, n_gammas, simplex_resolution
     )
     care.fit()

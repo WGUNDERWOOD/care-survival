@@ -1,6 +1,7 @@
 import numpy as np
+import itertools
 
-from care_survival import simplex as care_simplex
+from care_survival import convex as care_convex
 from care_survival import kernel_estimator as care_kernel_estimator
 from care_survival import metrics as care_metrics
 
@@ -14,16 +15,16 @@ class CARE:
         self.gammas = get_gammas(gamma_min, gamma_max, n_gammas)
         self.simplex_resolution = simplex_resolution
         self.simplex_dimension = np.shape(embedding.data["train"].f_tilde)[1]
-        self.thetas = care_simplex.get_simplex(
-            self.simplex_dimension, simplex_resolution
-        )
+        self.thetas = get_simplex(self.simplex_dimension, simplex_resolution)
+        self.n_thetas = len(self.thetas)
 
     def fit(self):
         beta_hat = self.embedding.data["train"].get_default_beta()
         inv_hessian_hat = self.embedding.data["train"].get_default_inv_hessian()
-        self.simplex_selections = [None for _ in range(self.n_gammas)]
+        self.convex_estimators = []
 
         for i in range(self.n_gammas):
+            # fit kernel estimator at gamma
             gamma = self.gammas[i]
             kernel_estimator = care_kernel_estimator.KernelEstimator(
                 self.embedding, gamma
@@ -31,11 +32,12 @@ class CARE:
             kernel_estimator.fit(beta_hat, inv_hessian_hat)
             inv_hessian_hat = kernel_estimator.inv_hessian_hat
             beta_hat = kernel_estimator.beta_hat
-            simplex_selection = care_simplex.SimplexSelection(
-                kernel_estimator, self.simplex_resolution
-            )
-            simplex_selection.fit()
-            self.simplex_selections[i] = simplex_selection
+
+            for j in range(self.n_thetas):
+                # fit convex estimator at theta
+                theta = self.thetas[j]
+                convex_estimator = care_convex.ConvexEstimator(kernel_estimator, theta)
+                self.convex_estimators.append(convex_estimator)
 
         self.best = {}
         for model in care_metrics.get_models():
@@ -50,8 +52,7 @@ class CARE:
     def best_by(self, model, metric, split):
         cs = [
             c
-            for s in self.simplex_selections
-            for c in s.convex_estimators
+            for c in self.convex_estimators
             if c.score[metric][split] is not None
         ]
 
@@ -93,3 +94,13 @@ class CARE:
 def get_gammas(gamma_min, gamma_max, n_gammas):
     ratio = (gamma_max / gamma_min) ** (1 / (n_gammas - 1))
     return [gamma_min * ratio**i for i in reversed(range(n_gammas))]
+
+def get_simplex(simplex_dimension, simplex_resolution):
+    n_values = int(np.ceil(1 / simplex_resolution))
+    values = [i * simplex_resolution for i in range(n_values)]
+    values.append(1)
+    values = list(set(values))
+    values_rep = [values for _ in range(simplex_dimension)]
+    simplex = list(itertools.product(*values_rep))
+    simplex = [np.array(s) for s in simplex if np.sum(s) <= 1]
+    return simplex
