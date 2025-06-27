@@ -40,10 +40,6 @@ def get_l2_split(f, embedding, split):
 
 
 def get_concordance_split(f, embedding, split):
-    # for speed
-    if split != "test":
-        return np.inf
-
     embedding_data = embedding.data[split]
     I = embedding_data.I
     n = embedding_data.n
@@ -63,11 +59,14 @@ def get_concordance_split(f, embedding, split):
         return 0
 
 
-def get_metric_split(f, embedding, metric, split):
+def get_metric_split(f, embedding, metric, split, with_concordance):
     if metric == "ln":
         score = get_ln_split(f, embedding, split)
     elif metric == "l2":
         score = get_l2_split(f, embedding, split)
     elif metric == "concordance":
-        score = get_concordance_split(f, embedding, split)
+        if split in with_concordance:
+            score = get_concordance_split(f, embedding, split)
+        else:
+            return np.inf
     return float(score)

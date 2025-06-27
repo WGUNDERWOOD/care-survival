@@ -13,18 +13,14 @@ from care_survival import distributions as care_distributions
 def main():
     dgp = int(sys.argv[1])
     today = datetime.now().strftime("%Y-%m-%d")
+    np.random.seed(4)
 
     # data
     n = 200
-    n_train = n
-    n_valid = n
-    n_test = n
-
     distribution = care_distributions.get_distribution(dgp)
-    np.random.seed(4)
-    data_train = distribution.sample(n_train)
-    data_valid = distribution.sample(n_valid)
-    data_test = distribution.sample(n_test)
+    data_train = distribution.sample(n)
+    data_valid = distribution.sample(n)
+    data_test = distribution.sample(n)
 
     # kernel
     a = 1
@@ -39,8 +35,10 @@ def main():
     gamma_min = 1e-5
     gamma_max = 1e1
     simplex_resolution = 1
+    with_concordance = []
+    verbose = True
     care = care_aggregation.CARE(
-        embedding, gamma_min, gamma_max, n_gammas, simplex_resolution, verbose=True
+        embedding, gamma_min, gamma_max, n_gammas, simplex_resolution, with_concordance, verbose
     )
     care.fit()
 
