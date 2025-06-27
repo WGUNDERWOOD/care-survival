@@ -14,6 +14,10 @@ This project uses just to run scripts.
 To execute all of the simulations, run `just`.
 The recipes can be found in the justfile.
 
+The scripts to run the SCORE2 data analysis
+are also available in the bin directory,
+but require access to UK Biobank data.
+
 ## Publishing to PyPI
 
 To publish to TestPyPI with an API token, run
