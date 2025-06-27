@@ -16,9 +16,20 @@ def main():
     today = datetime.now().strftime("%Y-%m-%d")
 
     ns = [
-        10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100,
-        #120, 150, 200, 250,
-        #300, 350, 400, 450, 500,
+        10,
+        15,
+        20,
+        25,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        # 120, 150, 200, 250,
+        # 300, 350, 400, 450, 500,
     ]
     n_test = 500
 
@@ -38,8 +49,7 @@ def main():
 
     for n in ns:
         now = datetime.now().strftime("%H:%M:%S.%f")
-        print(f"{now}, dgp = {dgp}, rep = {rep}, n = {n}", flush=True);
-
+        print(f"{now}, dgp = {dgp}, rep = {rep}, n = {n}", flush=True)
         # data
         data_train = distribution.sample(n)
         data_valid = distribution.sample(n)
@@ -50,7 +60,13 @@ def main():
 
         # fit care estimator
         care = care_aggregation.CARE(
-            embedding, gamma_min, gamma_max, n_gammas, simplex_resolution, with_concordance, verbose
+            embedding,
+            gamma_min,
+            gamma_max,
+            n_gammas,
+            simplex_resolution,
+            with_concordance,
+            verbose,
         )
         care.fit()
         cares.append(care)
@@ -67,6 +83,7 @@ def write_summary(cares, rep, path):
     results = results.drop(["n_train", "n_valid"], axis=1)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     results.to_csv(path)
+
 
 if __name__ == "__main__":
     main()

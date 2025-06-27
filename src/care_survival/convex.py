@@ -33,6 +33,10 @@ class ConvexEstimator:
             score[metric] = {}
             for split in care_metrics.get_splits():
                 score[metric][split] = care_metrics.get_metric_split(
-                    f[split], embedding, metric, split, self.kernel_estimator.with_concordance
+                    f[split],
+                    embedding,
+                    metric,
+                    split,
+                    self.kernel_estimator.with_concordance,
                 )
         return score

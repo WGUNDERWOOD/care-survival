@@ -38,7 +38,13 @@ def main():
     with_concordance = []
     verbose = True
     care = care_aggregation.CARE(
-        embedding, gamma_min, gamma_max, n_gammas, simplex_resolution, with_concordance, verbose
+        embedding,
+        gamma_min,
+        gamma_max,
+        n_gammas,
+        simplex_resolution,
+        with_concordance,
+        verbose,
     )
     care.fit()
 
