@@ -1,25 +1,29 @@
 # care-survival
 
-This package is a work in progress.
+Upgrading survival models with CARE.
 
-## Usage with uv
+## Building the Python package
 
-To run the main entry point
+This project uses uv to manage Python dependencies.
+To build the Python package, run `uv build`.
+To update the lockfile, use `uv lock`.
 
-`uv run bin/main.py`
+## Running the simulation scripts
 
-To build the Python package
+This project uses just to run scripts.
+To execute all of the simulations, run `just`.
+The recipes can be found in the justfile.
 
-`uv build`
+## Publishing to PyPI
 
-To publish to TestPyPI
+To publish to TestPyPI with an API token, run
 
-`uv publish --index testpypi --token <token>`
+```
+uv publish --index testpypi --token <token>
+```
 
-To publish to PyPI
+To publish to PyPI with an API token, run
 
-`uv publish --token <token>`
-
-To add a new package as a dependency
-
-`uv add <package>; uv lock`, then reload the nix development environment
+```
+uv publish --token <token>
+```

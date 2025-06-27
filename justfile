@@ -1,6 +1,6 @@
 REPS := "10"
 
-all: illustration
+all: illustration analysis
 
 illustration:
     uv run bin/illustration_simulation.py 1
