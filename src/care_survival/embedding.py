@@ -43,7 +43,7 @@ class EmbeddingData:
                 self.K
                 - self.K_bar
                 - self.K_bar.reshape(-1, 1)
-                - np.outer(self.K_bar, self.K_bar) * self.norm_one
+                + np.outer(self.K_bar, self.K_bar) * self.norm_one**2
             )
 
         elif method == "feature_map":

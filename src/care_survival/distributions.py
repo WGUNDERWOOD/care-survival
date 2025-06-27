@@ -5,6 +5,7 @@ import numpy as np
 
 class Distribution:
     def __init__(self, d, TC_low, TC_high, f_tilde_funcs, f_0_func, Lambda_inv):
+        self.d = d
         self.TC_low = TC_low
         self.TC_high = TC_high
         self.f_tilde_funcs = f_tilde_funcs
@@ -23,7 +24,7 @@ class Distribution:
         f_tilde = np.array([[f(X[i, :]) for f in self.f_tilde_funcs] for i in range(n)])
         f_0_mean = np.sum(f_0_X) / n
         f_0 = f_0_X - f_0_mean
-        return care_data.data(X, T, I, f_tilde, f_0)
+        return care_data.Data(X, T, I, f_tilde, f_0)
 
 
 def get_distribution(dgp):
@@ -44,6 +45,9 @@ def get_distribution(dgp):
             b = 1.5
             return np.sum(2 * np.sin(b * x) - 2 * (1 - np.cos(b)) / b)
 
+        f_tilde_funcs = [f_tilde_func]
+        return Distribution(d, TC_low, TC_high, f_tilde_funcs, f_0_func, Lambda_inv)
+
     elif dgp == 2:
         d = 10
 
@@ -54,5 +58,5 @@ def get_distribution(dgp):
             b = 6 * (np.sin(2) - np.cos(2) - 1)
             return np.sum(b * (x[0:4] - 0.5))
 
-    f_tilde_funcs = [f_tilde_func]
-    return Distribution(d, TC_low, TC_high, f_tilde_funcs, f_0_func, Lambda_inv)
+        f_tilde_funcs = [f_tilde_func]
+        return Distribution(d, TC_low, TC_high, f_tilde_funcs, f_0_func, Lambda_inv)

@@ -22,6 +22,7 @@ class CARE:
         beta_hat = self.embedding.data["train"].get_default_beta()
         inv_hessian_hat = self.embedding.data["train"].get_default_inv_hessian()
         self.convex_estimators = []
+        self.kernel_estimators = []
 
         for i in range(self.n_gammas):
             # fit kernel estimator at gamma
@@ -30,6 +31,7 @@ class CARE:
                 self.embedding, gamma
             )
             kernel_estimator.fit(beta_hat, inv_hessian_hat)
+            self.kernel_estimators.append(kernel_estimator)
             inv_hessian_hat = kernel_estimator.inv_hessian_hat
             beta_hat = kernel_estimator.beta_hat
 
