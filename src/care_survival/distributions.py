@@ -24,3 +24,35 @@ class Distribution:
         f_0_mean = np.sum(f_0_X) / n
         f_0 = f_0_X - f_0_mean
         return care_data.data(X, T, I, f_tilde, f_0)
+
+
+def get_distribution(dgp):
+    TC_low = 0.2
+    TC_high = 2
+    lam = 6.0
+
+    def Lambda_inv(t):
+        return t / lam
+
+    if dgp == 1:
+        d = 1
+
+        def f_0_func(x):
+            return np.sum(2 * np.sin(2 * x) - 2 * np.sin(1) ** 2)
+
+        def f_tilde_func(x):
+            b = 1.5
+            return np.sum(2 * np.sin(b * x) - 2 * (1 - np.cos(b)) / b)
+
+    elif dgp == 2:
+        d = 10
+
+        def f_0_func(x):
+            return np.sum(2 * np.sin(2 * x[0:5]) - 2 * np.sin(1) ** 2)
+
+        def f_tilde_func(x):
+            b = 6 * (np.sin(2) - np.cos(2) - 1)
+            return np.sum(b * (x[0:4] - 0.5))
+
+    f_tilde_funcs = [f_tilde_func]
+    return Distribution(d, TC_low, TC_high, f_tilde_funcs, f_0_func, Lambda_inv)
