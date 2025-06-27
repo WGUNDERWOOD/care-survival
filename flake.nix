@@ -109,6 +109,7 @@
             python
             pkgs.uv
             pkgs.ruff
+            pkgs.parallel
           ];
           env =
             {

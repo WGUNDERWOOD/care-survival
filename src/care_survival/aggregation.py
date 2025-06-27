@@ -7,7 +7,15 @@ from care_survival import metrics as care_metrics
 
 
 class CARE:
-    def __init__(self, embedding, gamma_min, gamma_max, n_gammas, simplex_resolution):
+    def __init__(
+        self,
+        embedding,
+        gamma_min,
+        gamma_max,
+        n_gammas,
+        simplex_resolution,
+        verbose=False,
+    ):
         self.embedding = embedding
         self.gamma_min = gamma_min
         self.gamma_max = gamma_max
@@ -17,6 +25,7 @@ class CARE:
         self.simplex_dimension = np.shape(embedding.data["train"].f_tilde)[1]
         self.thetas = get_simplex(self.simplex_dimension, simplex_resolution)
         self.n_thetas = len(self.thetas)
+        self.verbose = verbose
 
     def fit(self):
         beta_hat = self.embedding.data["train"].get_default_beta()
@@ -27,11 +36,12 @@ class CARE:
         for i in range(self.n_gammas):
             # fit kernel estimator at gamma
             gamma = self.gammas[i]
+            if self.verbose:
+                print(f"{i + 1} / {self.n_gammas}: gamma = {gamma}")
             kernel_estimator = care_kernel_estimator.KernelEstimator(
                 self.embedding, gamma
             )
             kernel_estimator.fit(beta_hat, inv_hessian_hat)
-            self.kernel_estimators.append(kernel_estimator)
             inv_hessian_hat = kernel_estimator.inv_hessian_hat
             beta_hat = kernel_estimator.beta_hat
 
@@ -40,6 +50,8 @@ class CARE:
                 theta = self.thetas[j]
                 convex_estimator = care_convex.ConvexEstimator(kernel_estimator, theta)
                 self.convex_estimators.append(convex_estimator)
+                if np.sum(theta) == 0:
+                    self.kernel_estimators.append(convex_estimator)
 
         self.best = {}
         for model in care_metrics.get_models():
