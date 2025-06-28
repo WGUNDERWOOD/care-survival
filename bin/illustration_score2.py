@@ -6,12 +6,15 @@ from care_survival import embedding as care_embedding
 
 def main():
     sex = sys.argv[1]
-    n_female = 162682
-    n_male = 121333
-    if sex == "female":
-        n_train = n_female
-    elif sex == "male":
-        n_train = n_male
+
+    n_train = 60
+    #n_female = 162682
+    #n_male = 121333
+    #if sex == "female":
+        #n_train = n_female
+    #elif sex == "male":
+        #n_train = n_male
+
     n_valid = 0
     n_test = 0
     covs = ["imd"]
@@ -31,7 +34,6 @@ def main():
 
     # TODO write this file
 
-    exit()
 
     #// get high and low imd data sets
     #let mut imds: Vec<f64> =

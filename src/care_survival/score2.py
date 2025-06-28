@@ -1,124 +1,60 @@
-##[must_use]
-#pub fn get_score2_data(
-#    n_train: usize,
-#    n_valid: usize,
-#    n_test: usize,
-#    covs: &[String],
-#    sex: Sex,
-#    dry_run: bool,
-#    rep: usize,
-#) -> (Data, Data, Data, Array1<f64>) {
-#    // read data
-#    let file = if dry_run {
-#        let mut dir = current_dir().unwrap();
-#        dir = dir.join("data");
-#        let path = dir.join("score2_test.csv");
-#        read_to_string(&path).unwrap()
-#    } else {
-#        let mut dir = home_dir().unwrap();
-#        dir = dir.join("rds/rds-ceu-ukbiobank-RtePkTecWB4");
-#        dir = dir.join("projects/P7439/lambertlab/wgu21/data");
-#        let path = dir.join(format!("df_scaled_{sex}.csv"));
-#        read_to_string(&path).unwrap()
-#    };
-#
-#    let n = n_train + n_valid + n_test;
-#    let n_avail = file.lines().count() - 1;
-#    //dbg!(n_avail);
-#    assert!(n <= n_avail);
-#    // CSV format: X1, ..., Xd, score2_rel, T, I
-#    let d_all = file.lines().next().unwrap().split(',').count() - 3;
-#    let all_covs: Vec<String> = file
-#        .lines()
-#        .next()
-#        .unwrap()
-#        .split(',')
-#        .take(d_all)
-#        .map(std::borrow::ToOwned::to_owned)
-#        .collect();
-#    let cov_indices: Vec<usize> = (0..d_all)
-#        .filter(|&i| covs.contains(&all_covs[i]))
-#        .collect();
-#    let d = cov_indices.len();
-#    let mut X: Array2<f64> = Array2::zeros((n_avail, d));
-#    let mut score2_rel: Array1<f64> = Array1::zeros(n_avail);
-#    let mut T: Array1<f64> = Array1::zeros(n_avail);
-#    let mut I: Array1<bool> = Array1::from_shape_fn(n_avail, |_| false);
-#
-#    // extract data
-#    for (i, line) in file.lines().skip(1).take(n_avail).enumerate() {
-#        let split: Vec<&str> = line.split(',').collect();
-#        for j in 0..d {
-#            let k = cov_indices[j];
-#            X[[i, j]] = split[k].parse().unwrap();
-#        }
-#        score2_rel[i] = split[d_all].parse().unwrap();
-#        T[i] = split[d_all + 1].parse().unwrap();
-#        I[i] = split[d_all + 2].parse().unwrap();
-#    }
-#
-#    // randomise order of rows
-#    // the first n_test rows will be the test set
-#    // so they should remain fixed
-#
-#    // get a random ordering of all the samples
-#    let mut rng = StdRng::seed_from_u64(0);
-#    let mut all_is: Vec<usize> = (0..n_avail).collect();
-#    all_is.shuffle(&mut rng);
-#
-#    // fix the first n_test for predictable test set
-#    let mut test_is: Vec<usize> = all_is[0..n_test].to_vec();
-#
-#    // shuffle the remaining samples by the value of rep
-#    let mut rng = StdRng::seed_from_u64(rep as u64);
-#    let mut other_is: Vec<usize> = all_is[n_test..n_avail].to_vec();
-#    other_is.shuffle(&mut rng);
-#
-#    // join the indices and apply the premutation
-#    test_is.append(&mut other_is);
-#    let is = test_is;
-#    //dbg!(&is[0..n_test]);
-#    //dbg!(&is[n_test..]);
-#    let X = X.select(Axis(0), &is);
-#    let T = T.select(Axis(0), &is);
-#    let I = I.select(Axis(0), &is);
-#    let score2_rel = score2_rel.select(Axis(0), &is);
-#
-#    // split data into train, validate, test
-#    let data_test = Data {
-#        n: n_test,
-#        d,
-#        X: X.slice(s![..n_test, ..]).to_owned(),
-#        T: T.slice(s![..n_test]).to_owned(),
-#        I: I.slice(s![..n_test]).to_owned(),
-#        f0_vals: None,
-#    };
-#
-#    let data_train = Data {
-#        n: n_train,
-#        d,
-#        X: X.slice(s![n_test..n_train + n_test, ..]).to_owned(),
-#        T: T.slice(s![n_test..n_train + n_test]).to_owned(),
-#        I: I.slice(s![n_test..n_train + n_test]).to_owned(),
-#        f0_vals: None,
-#    };
-#
-#    let data_valid = Data {
-#        n: n_valid,
-#        d,
-#        X: X.slice(s![n_train + n_test..n, ..]).to_owned(),
-#        T: T.slice(s![n_train + n_test..n]).to_owned(),
-#        I: I.slice(s![n_train + n_test..n]).to_owned(),
-#        f0_vals: None,
-#    };
-#
-#    assert!(data_train.I.len() == n_train);
-#    assert!(data_valid.I.len() == n_valid);
-#    assert!(data_test.I.len() == n_test);
-#
-#    (data_train, data_valid, data_test, score2_rel)
-#}
-#
+from care_survival import data as care_data
+
+import numpy as np
+import pandas as pd
+
+def get_score2_data(n_train, n_valid, n_test, covs, sex, dry_run, rep):
+    # read data
+    if dry_run:
+        file = pd.read_csv("./data/score2_test.csv")
+
+    else:
+        path = "~/rds/rds-ceu-ukbiobank-RtePkTecWB4/projects/"
+        path += f"P7439/lambertlab/wgu21/data/df_scaled_{sex}.csv"
+        file = pd.read_csv(path)
+
+    n = n_train + n_valid + n_test
+    n_avail = len(file)
+    print(file[0:5])
+
+    # CSV format: X1, ..., Xd, score2_rel, T, I
+    d_all = file.shape[1] - 3;
+    all_covs = file.columns[0:d_all]
+    cov_indices = [i for i in range(d_all) if all_covs[i] in covs]
+    d = len(cov_indices)
+
+    # get a random ordering of all the samples
+    np.random.seed(0)
+    all_is = np.array(list(range(n_avail)))
+    np.random.shuffle(all_is)
+
+    # fix the first n_test for a predictable test set
+    test_is = all_is[0:n_test]
+
+    # shuffle the remaining samples by the value of rep
+    np.random.seed(rep)
+    other_is = all_is[n_test:n_avail]
+    np.random.shuffle(other_is)
+    train_is = other_is[0:n_train]
+    valid_is = other_is[n_train:n_train+n_valid]
+
+    # get the data
+    X = np.array(file[covs])
+    T = np.array(file["time"])
+    I = np.array(file["censored"])
+    score2_rel = np.array(file[["score2_rel"]])
+    f_0 = np.full((len(I), 1), np.nan)
+
+    data_train = care_data.Data(X[train_is], T[train_is], I[train_is], score2_rel[train_is], f_0)
+    data_valid = care_data.Data(X[valid_is], T[valid_is], I[valid_is], score2_rel[valid_is], f_0)
+    data_test = care_data.Data(X[test_is], T[test_is], I[test_is], score2_rel[test_is], f_0)
+
+    assert len(data_train.T) == n_train
+    assert len(data_valid.T) == n_valid
+    assert len(data_test.T) == n_test
+
+    return (data_train, data_valid, data_test, score2_rel)
+
 ##[must_use]
 #pub fn get_score2_rel(x: ArrayView1<f64>, sex: Sex) -> f64 {
 #    // beta male
