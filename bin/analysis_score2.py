@@ -1,17 +1,17 @@
 ##![allow(non_snake_case)]
-#use chrono::Local;
-#use ndarray::{ArrayView1, Axis};
-#use std::env::{args, current_dir};
+# use chrono::Local;
+# use ndarray::{ArrayView1, Axis};
+# use std::env::{args, current_dir};
 #
-#use rkhs_survival::common::*;
-#use rkhs_survival::embedding::*;
-#use rkhs_survival::external::*;
-#use rkhs_survival::kernel::*;
-#use rkhs_survival::selection::*;
+# use rkhs_survival::common::*;
+# use rkhs_survival::embedding::*;
+# use rkhs_survival::external::*;
+# use rkhs_survival::kernel::*;
+# use rkhs_survival::selection::*;
 #
-#const EPS: f64 = 1e-8;
+# const EPS: f64 = 1e-8;
 #
-#fn main() {
+# fn main() {
 #    // args
 #    let args: Vec<String> = args().collect();
 #    let model: usize = args[1].parse().unwrap();
@@ -174,9 +174,9 @@
 #        .join("analysis")
 #        .join(file_name);
 #    selection_results.write(&path);
-#}
+# }
 #
-#fn get_covs(model: usize) -> Vec<String> {
+# fn get_covs(model: usize) -> Vec<String> {
 #    let score2_covs = [
 #        "age",
 #        "hdl",
@@ -199,4 +199,4 @@
 #        .chain(new_covs.iter())
 #        .map(|&s| s.into())
 #        .collect()
-#}
+# }

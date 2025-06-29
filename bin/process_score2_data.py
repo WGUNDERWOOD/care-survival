@@ -1,10 +1,10 @@
 ##![allow(non_snake_case)]
 #
-#use dirs::home_dir;
-#use polars::prelude::*;
-#use std::fs::File;
+# use dirs::home_dir;
+# use polars::prelude::*;
+# use std::fs::File;
 #
-#fn main() {
+# fn main() {
 #    let mut dir = home_dir().unwrap();
 #    dir = dir.join("rds/rds-ceu-ukbiobank-RtePkTecWB4");
 #    dir = dir.join("projects/P7439/lambertlab/wgu21/data");
@@ -147,4 +147,4 @@
 #        .with_separator(b',')
 #        .finish(&mut df_female.collect().unwrap())
 #        .unwrap();
-#}
+# }
