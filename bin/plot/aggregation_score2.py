@@ -7,6 +7,7 @@ import numpy as np
 import sys
 import common
 
+
 def plot_aggregation_score2(csv_path, plot_path, sex):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "model_" + model + "_" + sex in f]
@@ -15,22 +16,22 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     print(df_all)
     df_all = df_all.drop(["sex"], axis=1)
     df = df_all.groupby("n").mean()
-    #print(df.index)
-    #print(df["concordance_tilde"])
+    # print(df.index)
+    # print(df["concordance_tilde"])
     n_rep = df_all["rep"].nunique()
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
     ct_all = df["concordance_tilde"][df.index == max(df.index)]
     cc_all = df["concordance_check"][df.index == max(df.index)]
-    #ct_small = df["concordance_tilde"][df.index == 10000]
-    #cc_small = df["concordance_check"][df.index == 10000]
-    #print(ct_all)
-    #print(cc_all)
-    #print(ct_small)
-    #print(cc_small)
-    #print("n=10000")
-    #print(100*((cc_small - ct_small) / ct_small).values[0])
-    #print("n=all")
-    print(100*((cc_all - ct_all) / ct_all).values[0])
+    # ct_small = df["concordance_tilde"][df.index == 10000]
+    # cc_small = df["concordance_check"][df.index == 10000]
+    # print(ct_all)
+    # print(cc_all)
+    # print(ct_small)
+    # print(cc_small)
+    # print("n=10000")
+    # print(100*((cc_small - ct_small) / ct_small).values[0])
+    # print("n=all")
+    print(100 * ((cc_all - ct_all) / ct_all).values[0])
     cols = ["concordance_check", "concordance_hat", "concordance_tilde"]
 
     for c in cols:
@@ -42,20 +43,40 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     # plot error bands
     for c in cols:
         if c != "concordance_tilde":
-            plt.fill_between(df.index, df[c] - 2 * df[c + "_std"],
-                             df[c] + 2 * df[c + "_std"],
-                             fc=common.std_col())
+            plt.fill_between(
+                df.index,
+                df[c] - 2 * df[c + "_std"],
+                df[c] + 2 * df[c + "_std"],
+                fc=common.std_col(),
+            )
 
     # plot averages
-    plt.plot(df.index, df["concordance_check"], c="k", lw=1,
-             label = "CARE method $\\check f_{n,\\check\\gamma,\\check\\theta}$")
-    plt.plot(df.index, df["concordance_hat"], c="k", lw=1, ls="-.",
-             label = "Kernel estimator $\\hat f_{n,\\hat\\gamma}$")
-    plt.plot(df.index, df["concordance_tilde"], c="k", lw=1, ls=":",
-             label = "SCORE2 model $\\tilde f$")
+    plt.plot(
+        df.index,
+        df["concordance_check"],
+        c="k",
+        lw=1,
+        label="CARE method $\\check f_{n,\\check\\gamma,\\check\\theta}$",
+    )
+    plt.plot(
+        df.index,
+        df["concordance_hat"],
+        c="k",
+        lw=1,
+        ls="-.",
+        label="Kernel estimator $\\hat f_{n,\\hat\\gamma}$",
+    )
+    plt.plot(
+        df.index,
+        df["concordance_tilde"],
+        c="k",
+        lw=1,
+        ls=":",
+        label="SCORE2 model $\\tilde f$",
+    )
 
     if sex == "male" and model == "2":
-        plt.legend(loc='lower right', bbox_to_anchor=(0.5, 0.08, 0.5, 0.5))
+        plt.legend(loc="lower right", bbox_to_anchor=(0.5, 0.08, 0.5, 0.5))
     else:
         plt.legend()
 
@@ -68,9 +89,10 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
 
     plt.xlabel("Training/validation sample size $n$")
     plt.ylabel("Concordance index")
-    ax.xaxis.set_major_formatter(ticker.StrMethodFormatter('{x:,.0f}'))
+    ax.xaxis.set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
+
 
 for model in ["1", "2"]:
     for sex in ["female", "male"]:

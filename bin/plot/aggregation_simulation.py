@@ -6,6 +6,7 @@ import os
 import pandas as pd
 import common
 
+
 def plot_aggregation(csv_path, plot_path, dgp):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "dgp_" + dgp in f]
@@ -24,19 +25,40 @@ def plot_aggregation(csv_path, plot_path, dgp):
     # plot error band
     for c in cols:
         if c != "l2_tilde":
-            plt.fill_between(df.index, df[c] - 2 * df[c + "_std"],
-                             df[c] + 2 * df[c + "_std"],
-                             fc=common.std_col())
+            plt.fill_between(
+                df.index,
+                df[c] - 2 * df[c + "_std"],
+                df[c] + 2 * df[c + "_std"],
+                fc=common.std_col(),
+            )
 
     # plot averages
-    plt.plot(df.index, df["l2_check"], c="k", lw=1,
-             label = "CARE method $\\check f_{n,\\check\\gamma,\\check\\theta}$")
-    plt.plot(df.index, df["l2_hat"], c="k", lw=1, ls="-.",
-             label = "Kernel estimator $\\hat f_{n,\\hat\\gamma}$")
-    plt.plot(df.index, df["l2_dagger"], c="k", lw=1, ls="--",
-             label = "Oracle $\\check f_{n,\\gamma^\\dagger,\\theta^\\dagger}$")
-    plt.plot(df.index, df["l2_tilde"], c="k", lw=1, ls=":",
-             label = "External $\\tilde f$")
+    plt.plot(
+        df.index,
+        df["l2_check"],
+        c="k",
+        lw=1,
+        label="CARE method $\\check f_{n,\\check\\gamma,\\check\\theta}$",
+    )
+    plt.plot(
+        df.index,
+        df["l2_hat"],
+        c="k",
+        lw=1,
+        ls="-.",
+        label="Kernel estimator $\\hat f_{n,\\hat\\gamma}$",
+    )
+    plt.plot(
+        df.index,
+        df["l2_dagger"],
+        c="k",
+        lw=1,
+        ls="--",
+        label="Oracle $\\check f_{n,\\gamma^\\dagger,\\theta^\\dagger}$",
+    )
+    plt.plot(
+        df.index, df["l2_tilde"], c="k", lw=1, ls=":", label="External $\\tilde f$"
+    )
 
     if dgp == "2":
         plt.ylim([0.33, 1.22])
@@ -46,6 +68,7 @@ def plot_aggregation(csv_path, plot_path, dgp):
     plt.legend()
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
+
 
 for dgp in ["1", "2"]:
     date = sys.argv[1]

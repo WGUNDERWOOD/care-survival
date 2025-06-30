@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import common
 
+
 def plot_regularisation(csv_path, plot_path, dgp):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "dgp_" + dgp in f]
@@ -24,19 +25,30 @@ def plot_regularisation(csv_path, plot_path, dgp):
     (fig, ax) = plt.subplots(figsize=(4, 3))
 
     # plot averages
-    plt.plot(df.index, np.exp(df["log_gamma_hat"]),
-             c="k", lw=1,
-             label = "Cross-validated $\\hat\\gamma$")
-    plt.plot(df.index, np.exp(df["log_gamma_star"]),
-             c="k", lw=1, ls="--",
-             label = "Oracle $\\gamma^\\star$")
+    plt.plot(
+        df.index,
+        np.exp(df["log_gamma_hat"]),
+        c="k",
+        lw=1,
+        label="Cross-validated $\\hat\\gamma$",
+    )
+    plt.plot(
+        df.index,
+        np.exp(df["log_gamma_star"]),
+        c="k",
+        lw=1,
+        ls="--",
+        label="Oracle $\\gamma^\\star$",
+    )
 
     # plot error band
     for c in cols:
-        plt.fill_between(df.index,
-                         np.exp(df[c] - 2 * df[c + "_std"]),
-                         np.exp(df[c] + 2 * df[c + "_std"]),
-                         fc=common.std_col())
+        plt.fill_between(
+            df.index,
+            np.exp(df[c] - 2 * df[c + "_std"]),
+            np.exp(df[c] + 2 * df[c + "_std"]),
+            fc=common.std_col(),
+        )
 
     if dgp == "1":
         plt.ylim([9.2e-4, 1.1e-2])
@@ -49,6 +61,7 @@ def plot_regularisation(csv_path, plot_path, dgp):
     plt.legend()
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
+
 
 for dgp in ["1", "2"]:
     date = sys.argv[1]

@@ -1,12 +1,14 @@
 import matplotlib as mpl
 
 mpl.rcParams["text.usetex"] = True
-mpl.rcParams["mathtext.fontset"] = "cm";
-mpl.rcParams["font.family"] = "serif";
-mpl.rcParams["font.serif"] = "cm";
+mpl.rcParams["mathtext.fontset"] = "cm"
+mpl.rcParams["font.family"] = "serif"
+mpl.rcParams["font.serif"] = "cm"
+
 
 def std_col():
     return "#44444433"
+
 
 def filter_cumulative_increase(df, eps, col):
     indices_to_keep = [0]

@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import common
 
+
 def plot_kernel(csv_path, plot_path, dgp):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "dgp_" + dgp in f]
@@ -21,23 +22,38 @@ def plot_kernel(csv_path, plot_path, dgp):
 
     # plot error band
     for c in cols:
-        plt.fill_between(df.index, df[c] - 2 * df[c + "_std"],
-                         df[c] + 2 * df[c + "_std"],
-                         fc=common.std_col())
+        plt.fill_between(
+            df.index,
+            df[c] - 2 * df[c + "_std"],
+            df[c] + 2 * df[c + "_std"],
+            fc=common.std_col(),
+        )
 
     # plot averages
-    plt.plot(df.index, df["l2_hat"], c="k", lw=1,
-             label = "Cross-validated $\\hat f_{n,\\hat\\gamma}$")
-    plt.plot(df.index, df["l2_star"], c="k", lw=1, ls="--",
-             label = "Oracle $\\hat f_{n,\\gamma^\\star}$")
+    plt.plot(
+        df.index,
+        df["l2_hat"],
+        c="k",
+        lw=1,
+        label="Cross-validated $\\hat f_{n,\\hat\\gamma}$",
+    )
+    plt.plot(
+        df.index,
+        df["l2_star"],
+        c="k",
+        lw=1,
+        ls="--",
+        label="Oracle $\\hat f_{n,\\gamma^\\star}$",
+    )
 
-    #plt.plot(df.index[0], 0, c="#FFFFFF", lw=1)
-    #plt.plot(df.index[0], 0.75, c="#FFFFFF", lw=1)
+    # plt.plot(df.index[0], 0, c="#FFFFFF", lw=1)
+    # plt.plot(df.index[0], 0.75, c="#FFFFFF", lw=1)
     plt.xlabel("Sample size $n$")
     plt.ylabel("$L_2$-error")
     plt.legend()
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
+
 
 for dgp in ["1", "2"]:
     date = sys.argv[1]

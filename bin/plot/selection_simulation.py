@@ -6,6 +6,7 @@ import numpy as np
 import common
 import sys
 
+
 def plot_selection(csv_path, plot_path, dgp):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "dgp_" + dgp in f]
@@ -21,25 +22,39 @@ def plot_selection(csv_path, plot_path, dgp):
     (fig, ax) = plt.subplots(figsize=(4, 3))
 
     # plot averages
-    plt.plot(df.index, df["theta_check"], c="k", lw=1,
-             label = "Cross-validated $\\check\\theta$")
-    plt.plot(df.index, df["theta_dagger"], c="k", lw=1, ls="--",
-             label = "Oracle $\\theta^\\dagger$")
+    plt.plot(
+        df.index,
+        df["theta_check"],
+        c="k",
+        lw=1,
+        label="Cross-validated $\\check\\theta$",
+    )
+    plt.plot(
+        df.index,
+        df["theta_dagger"],
+        c="k",
+        lw=1,
+        ls="--",
+        label="Oracle $\\theta^\\dagger$",
+    )
 
     # plot error band
     for c in cols:
-        plt.fill_between(df.index,
-                         np.maximum(df[c] - 2 * df[c + "_std"], 0),
-                         np.minimum(df[c] + 2 * df[c + "_std"], 1),
-                         fc=common.std_col())
+        plt.fill_between(
+            df.index,
+            np.maximum(df[c] - 2 * df[c + "_std"], 0),
+            np.minimum(df[c] + 2 * df[c + "_std"], 1),
+            fc=common.std_col(),
+        )
 
-    #plt.plot(df.index[0], 0, c="#FFFFFF", lw=1)
-    #plt.plot(df.index[0], 1, c="#FFFFFF", lw=1)
+    # plt.plot(df.index[0], 0, c="#FFFFFF", lw=1)
+    # plt.plot(df.index[0], 1, c="#FFFFFF", lw=1)
     plt.xlabel("Sample size $n$")
     plt.ylabel("Convex combination $\\theta$")
     plt.legend()
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
+
 
 for dgp in ["1", "2"]:
     date = sys.argv[1]

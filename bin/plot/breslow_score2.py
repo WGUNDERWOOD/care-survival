@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 import common
 
+
 def plot_breslow_score2(csv_path, plot_path):
     df = pd.read_csv(csv_path)
     df = df.sort_values(by="T")
@@ -13,16 +14,27 @@ def plot_breslow_score2(csv_path, plot_path):
     (fig, ax) = plt.subplots(figsize=(4, 3))
 
     # low IMD
-    plt.plot(10 * df_low["T"], df_low["breslow_low"], c="k", lw=1,
-             label="Low \\texttt{imd}", ls="dotted")
+    plt.plot(
+        10 * df_low["T"],
+        df_low["breslow_low"],
+        c="k",
+        lw=1,
+        label="Low \\texttt{imd}",
+        ls="dotted",
+    )
 
     # high IMD
-    plt.plot(10 * df_high["T"], df_high["breslow_high"], c="k", lw=1,
-             label="High \\texttt{imd}", ls="dashed")
+    plt.plot(
+        10 * df_high["T"],
+        df_high["breslow_high"],
+        c="k",
+        lw=1,
+        label="High \\texttt{imd}",
+        ls="dashed",
+    )
 
     # baseline
-    plt.plot(10 * df["T"], df["breslow"], c="k", lw=1,
-             label="All")
+    plt.plot(10 * df["T"], df["breslow"], c="k", lw=1, label="All")
 
     plt.xlabel("Time $t$ (years)")
     plt.ylabel("Survival function $\\hat P(t)$")
@@ -33,6 +45,7 @@ def plot_breslow_score2(csv_path, plot_path):
 
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
+
 
 for sex in ["female", "male"]:
     date = sys.argv[1]
