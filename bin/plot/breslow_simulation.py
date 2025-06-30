@@ -3,6 +3,8 @@ import sys
 import pandas as pd
 import common
 
+common.init()
+
 
 def plot_breslow(csv_path, plot_path, dgp):
     df = pd.read_csv(csv_path)
@@ -28,7 +30,6 @@ def plot_breslow(csv_path, plot_path, dgp):
     plt.close("all")
 
 
-# dgp = "1"
 for dgp in ["1", "2"]:
     date = sys.argv[1]
     csv_path = "data/" + date + "/simulation"

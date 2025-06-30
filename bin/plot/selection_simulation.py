@@ -47,8 +47,6 @@ def plot_selection(csv_path, plot_path, dgp):
             fc=common.std_col(),
         )
 
-    # plt.plot(df.index[0], 0, c="#FFFFFF", lw=1)
-    # plt.plot(df.index[0], 1, c="#FFFFFF", lw=1)
     plt.xlabel("Sample size $n$")
     plt.ylabel("Convex combination $\\theta$")
     plt.legend()

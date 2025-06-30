@@ -46,8 +46,6 @@ def plot_kernel(csv_path, plot_path, dgp):
         label="Oracle $\\hat f_{n,\\gamma^\\star}$",
     )
 
-    # plt.plot(df.index[0], 0, c="#FFFFFF", lw=1)
-    # plt.plot(df.index[0], 0.75, c="#FFFFFF", lw=1)
     plt.xlabel("Sample size $n$")
     plt.ylabel("$L_2$-error")
     plt.legend()

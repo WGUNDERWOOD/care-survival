@@ -46,7 +46,6 @@ def get_concordance_split(f, embedding, split):
     R = embedding_data.R
     valid = 1 - I
 
-    # this is slow
     numerator = 0
     for j in np.where(valid)[0]:
         i_range = np.arange(R[j], n).astype(int)

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import common
 
 figsize = (2.4, 2.5)
+common.init()
 
 
 def plot_gaussian():

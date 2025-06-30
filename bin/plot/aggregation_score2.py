@@ -11,26 +11,13 @@ import common
 def plot_aggregation_score2(csv_path, plot_path, sex):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "model_" + model + "_" + sex in f]
-    print(csv_files)
     df_all = pd.concat(pd.read_csv(f) for f in csv_files)
-    print(df_all)
     df_all = df_all.drop(["sex"], axis=1)
     df = df_all.groupby("n").mean()
-    # print(df.index)
-    # print(df["concordance_tilde"])
     n_rep = df_all["rep"].nunique()
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
     ct_all = df["concordance_tilde"][df.index == max(df.index)]
     cc_all = df["concordance_check"][df.index == max(df.index)]
-    # ct_small = df["concordance_tilde"][df.index == 10000]
-    # cc_small = df["concordance_check"][df.index == 10000]
-    # print(ct_all)
-    # print(cc_all)
-    # print(ct_small)
-    # print(cc_small)
-    # print("n=10000")
-    # print(100*((cc_small - ct_small) / ct_small).values[0])
-    # print("n=all")
     print(100 * ((cc_all - ct_all) / ct_all).values[0])
     cols = ["concordance_check", "concordance_hat", "concordance_tilde"]
 

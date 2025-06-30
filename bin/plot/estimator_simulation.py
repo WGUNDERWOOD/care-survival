@@ -3,6 +3,8 @@ import pandas as pd
 import common
 import sys
 
+common.init()
+
 
 def plot_estimator(csv_path, plot_path, dgp):
     df = pd.read_csv(csv_path)

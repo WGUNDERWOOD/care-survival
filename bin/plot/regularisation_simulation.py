@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import sys
 import glob
 import os
 import pandas as pd
 import numpy as np
 import common
+
+common.init()
 
 
 def plot_regularisation(csv_path, plot_path, dgp):

@@ -3,6 +3,8 @@ import pandas as pd
 import sys
 import common
 
+common.init()
+
 
 def plot_validation(csv_path, plot_path, dgp):
     df = pd.read_csv(csv_path)
@@ -10,7 +12,7 @@ def plot_validation(csv_path, plot_path, dgp):
     (fig, ax) = plt.subplots(figsize=(4, 3))
 
     # validation curves
-    l1 = plt.plot(
+    plt.plot(
         df["gamma"],
         df["ln_train"],
         c="k",
@@ -18,7 +20,7 @@ def plot_validation(csv_path, plot_path, dgp):
         ls="--",
         label="Training loss $\\ell_n(\\hat f_{n,\\gamma})$",
     )
-    l2 = plt.plot(
+    plt.plot(
         df["gamma"],
         df["ln_valid"],
         c="k",
@@ -47,7 +49,6 @@ def plot_validation(csv_path, plot_path, dgp):
     plt.close("all")
 
 
-# dgp = "1"
 for dgp in ["1", "2"]:
     date = sys.argv[1]
     csv_path = "data/" + date + "/simulation"

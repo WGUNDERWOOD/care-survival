@@ -37,11 +37,7 @@ class KernelEstimator:
 
         if self.method == "kernel":
             K_hat_train = self.embedding.data["train"].K_hat
-            # Kb = K_hat_train @ beta
-            # print(K_hat_train)
-            # penalty = self.gamma * Kb.T @ beta
             penalty = self.gamma * beta.T @ K_hat_train @ beta
-            # print(penalty)
 
         elif self.method == "feature_map":
             Phi_bar = self.embedding.data["train"].Phi_bar
@@ -50,8 +46,6 @@ class KernelEstimator:
             penalty = self.gamma * np.sum(beta**2) + beta_0**2
 
         lng = ln + penalty
-        # print(ln)
-        # print(penalty)
         return lng
 
     def get_dlng_split(self, beta, split):
@@ -83,7 +77,6 @@ class KernelEstimator:
                 - 2 * self.gamma * Phi_bar * beta_0 / feature_const
             )
 
-        # print(dlng)
         return dlng
 
     def fit(self, beta_init, inv_hessian_init):

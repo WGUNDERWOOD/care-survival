@@ -25,6 +25,8 @@ The scripts to run the SCORE2 data analysis
 are also available in the bin directory,
 but require access to UK Biobank data.
 
+## Example usage
+
 ## Publishing to PyPI
 
 To publish to TestPyPI with an API token, run

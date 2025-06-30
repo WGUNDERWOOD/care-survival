@@ -6,6 +6,10 @@ mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.serif"] = "cm"
 
 
+def init():
+    pass
+
+
 def std_col():
     return "#44444433"
 

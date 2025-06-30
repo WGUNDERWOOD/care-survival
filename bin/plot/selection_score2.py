@@ -41,11 +41,6 @@ def plot_selection_score2(csv_path, plot_path, sex, model):
         label="Cross-validated $\\check\\theta$",
     )
 
-    # if sex == "female":
-    # plt.xlim([-500, 55555])
-    # else:
-    # plt.xlim([-500, 41000])
-
     plt.xlabel("Training/validation sample size $n$")
     plt.ylabel("Convex combination $\\theta$")
     ax.xaxis.set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
