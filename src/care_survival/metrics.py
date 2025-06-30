@@ -18,13 +18,16 @@ def get_models():
 def get_ln_split(f, embedding, split):
     embedding_data = embedding.data[split]
     n = embedding_data.n
-    f_max = np.max(f)
+    if n > 0:
+        f_max = np.max(f)
+    else:
+        f_max = 0
     f_expt = care_kernel_estimator.expt(f, f_max)
     sn = care_kernel_estimator.get_sn(embedding_data, f_expt)
     N = embedding_data.N
     ln_cent = embedding_data.ln_cent
 
-    return np.sum((np.log(sn) + f_max - f) * N) / n - ln_cent
+    return np.sum((np.log(sn) + f_max - f) * N) / max(n, 1) - ln_cent
 
 
 def get_l2_split(f, embedding, split):
@@ -35,7 +38,7 @@ def get_l2_split(f, embedding, split):
     else:
         n = len(f)
         diffs = f - f_0
-        mse = np.sum(diffs**2) / n
+        mse = np.sum(diffs**2) / max(n, 1)
         return np.sqrt(mse)
 
 

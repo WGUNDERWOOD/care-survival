@@ -6,6 +6,7 @@ from care_survival import metrics as care_metrics
 class ConvexEstimator:
     def __init__(self, kernel_estimator, theta):
         self.kernel_estimator = kernel_estimator
+        self.gamma = kernel_estimator.gamma
         self.theta = theta
         self.simplex_dimension = len(theta)
         self.f_check = {}
@@ -20,6 +21,7 @@ class ConvexEstimator:
         embedding_data = self.kernel_estimator.embedding.data
         for i in range(self.simplex_dimension):
             f_check = f_check + theta[i] * embedding_data[split].f_tilde[:, i]
+        f_check = f_check - np.sum(f_check) / max(len(f_check), 1)
         return f_check
 
     def get_score(self):

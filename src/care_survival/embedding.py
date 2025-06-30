@@ -32,7 +32,7 @@ class EmbeddingData:
             self.Z[i] = Z_prev
 
         self.R_bar = (self.n - self.R) / self.n
-        self.ln_cent = np.sum(np.log(self.R_bar) * self.N) / self.n
+        self.ln_cent = np.sum(np.log(self.R_bar) * self.N) / max(self.n, 1)
 
         if method == "kernel":
             self.norm_one = kernel.norm_one()
@@ -50,7 +50,7 @@ class EmbeddingData:
             self.feature_dim = kernel.feature_dim(self.d)
             self.feature_const = kernel.feature_const()
             self.Phi = kernel.phi(self.X)
-            self.Phi_bar = np.sum(self.Phi, axis=0) / self.n
+            self.Phi_bar = np.sum(self.Phi, axis=0) / max(self.n, 1)
             self.Phi_tilde = self.Phi - self.Phi_bar
 
         self.breslow = self.get_breslow()

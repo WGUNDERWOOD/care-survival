@@ -1,77 +1,71 @@
-import sys
 import numpy as np
-# import pprint
+import pprint
 
-# from care_survival import data as care_data
-from care_survival import distributions as care_distributions
-from care_survival import kernels as care_kernels
-from care_survival import embedding as care_embedding
-
-# from care_survival import aggregation as care_aggregation
-from care_survival import kernel_estimator as care_kernel_estimator
-
+import care_survival
 
 def main():
-    dgp = int(sys.argv[1])
+    np.random.seed(0)
 
-    # data
-    n = 5
-    n_train = n
-    n_valid = n
-    n_test = n
+    # generate some sample data
+    n = 60
+    d = 2
+    X = np.random.random((n, d))
+    T = X.sum(axis=1) + 1 + np.random.random(n)
+    I = (np.random.random(n) > 0.8) * 1
+    f = (-X.sum(axis=1) / 2 + np.random.random(n)).reshape(-1, 1)
 
-    distribution = care_distributions.get_distribution(dgp)
-    np.random.seed(4)
-    data_train = distribution.sample(n_train)
-    data_valid = distribution.sample(n_valid)
-    data_test = distribution.sample(n_test)
+    # split data into training and validation sets
+    n_train = int(np.ceil(n / 2))
+    X_train = X[0:n_train]
+    T_train = T[0:n_train]
+    I_train = I[0:n_train]
+    f_train = f[0:n_train]
+    X_valid = X[n_train:n]
+    T_valid = T[n_train:n]
+    I_valid = I[n_train:n]
+    f_valid = f[n_train:n]
 
-    # kernel
+    # define a kernel and use the feature map optimisation method
     a = 1
-    # p = 2
-    # sigma = 0.5
-    # kernel = care_kernels.PolynomialKernel(a, p)
-    # kernel = care_kernels.ShiftedGaussianKernel(a, sigma)
-    kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
+    p = 2
+    kernel = care_survival.PolynomialKernel(a, p)
+    method = "feature_map"
 
-    # optimisation method
-    method = "kernel"
-    # method = "feature_map"
+    # set up the kernel tuning parameters
+    n_gammas = 20
+    gamma_min = 1e-6
+    gamma_max = 1e1
 
-    # kernel/feature embedding
-    embedding = care_embedding.Embedding(
-        data_train, data_valid, data_test, kernel, method
-    )
-    print(embedding.data["train"].K)
-    print(embedding.data["train"].K_bar)
-    print(embedding.data["train"].K_tilde)
-    print(embedding.data["train"].K_hat)
+    # set up the simplex tuning parameters
+    simplex_resolution = 0.05
 
-    # fit a kernel estimator
-    gamma = 1
-    kernel_estimator = care_kernel_estimator.KernelEstimator(embedding, gamma)
-    beta_init = embedding.data["train"].get_default_beta()
-    inv_hessian_init = embedding.data["train"].get_default_inv_hessian()
-    kernel_estimator.fit(beta_init, inv_hessian_init)
-    # beta = np.random.random(n)
-    # beta = np.zeros(n)
-    # print(kernel_estimator.get_f(beta, "train"))
-    # print(get_sn(beta, "train"))
+    # compute concordance score on all data
+    with_concordance = ["train", "valid"]
 
     # fit CARE
-    # gamma_min = 1e-3
-    # gamma_max = 1e0
-    # n_gammas = 2
-    # simplex_resolution = 0.5
-    # care = care_aggregation.CARE(
-    # embedding, gamma_min, gamma_max, n_gammas, simplex_resolution
-    # )
-    # care.fit()
-    # best = care.best["aggregated"]["ln"]["test"]
-    # print(best.theta)
-    # print(best.score["ln"]["test"])
-    # pp = pprint.PrettyPrinter(indent=4)
-    # pp.pprint(care.summary)
+    care = care_survival.care(
+        X_train,
+        T_train,
+        I_train,
+        f_train,
+        X_valid,
+        T_valid,
+        I_valid,
+        f_valid,
+        kernel,
+        method,
+        n_gammas,
+        gamma_min,
+        gamma_max,
+        simplex_resolution,
+        with_concordance
+    )
+
+    # view diagnostics
+    best = care.best["aggregated"]["ln"]["valid"]
+    print("best theta value:", best.theta)
+    print("best gamma value:", best.gamma)
+    print("concordance index:", best.score["concordance"]["valid"])
 
 
 if __name__ == "__main__":
