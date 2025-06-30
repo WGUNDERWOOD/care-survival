@@ -20,7 +20,7 @@ def main():
     _n_male = 121333
     n_female_over_3 = 54227
     n_male_over_3 = 40444
-    dry_run = True
+    dry_run = False
 
     # set up parameters
     if dry_run:
@@ -28,7 +28,6 @@ def main():
         n_test = 20
     else:
         ns = [
-            2000,
             3000,
             4000,
             5000,
@@ -111,9 +110,9 @@ def get_covs(model):
         "age_smoking",
     ]
     if model == 1:
-        score2_covs.append("imd")
+        score2_covs += ["imd"]
     elif model == 2:
-        score2_covs.append(["imd", "pgs000018", "pgs000039"])
+        score2_covs += ["imd", "pgs000018", "pgs000039"]
 
     return score2_covs
 

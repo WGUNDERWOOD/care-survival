@@ -13,7 +13,7 @@ from care_survival import embedding as care_embedding
 def main():
     sex = sys.argv[1]
     today = datetime.now().strftime("%Y-%m-%d")
-    dry_run = True
+    dry_run = False
 
     if dry_run:
         n_train = 60
