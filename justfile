@@ -1,6 +1,8 @@
-REPS_SIM := "10"
+REPS_SIM := "50"
 REPS_SCORE2 := "2"
 DATE := "2025-06-30"
+
+default: simulation plot_simulation
 
 all: simulation score2 plot
 
