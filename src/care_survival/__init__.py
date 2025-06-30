@@ -1,4 +1,4 @@
-from .kernels import PolynomialKernel
-from .kernels import ShiftedGaussianKernel
-from .kernels import ShiftedFirstOrderSobolevKernel
-from.care import care
+from .kernels import PolynomialKernel as PolynomialKernel
+from .kernels import ShiftedGaussianKernel as ShiftedGaussianKernel
+from .kernels import ShiftedFirstOrderSobolevKernel as ShiftedFirstOrderSobolevKernel
+from .care import care as care

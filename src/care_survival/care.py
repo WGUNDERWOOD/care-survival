@@ -4,6 +4,7 @@ from care_survival import data as care_data
 from care_survival import embedding as care_embedding
 from care_survival import aggregation as care_aggregation
 
+
 def care(
     X_train,
     T_train,
