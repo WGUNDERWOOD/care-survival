@@ -1,106 +1,75 @@
-##![allow(non_snake_case)]
-# use chrono::Local;
-# use ndarray::{ArrayView1, Axis};
-# use std::env::{args, current_dir};
-#
-# use rkhs_survival::common::*;
-# use rkhs_survival::embedding::*;
-# use rkhs_survival::external::*;
-# use rkhs_survival::kernel::*;
-# use rkhs_survival::selection::*;
-#
-# const EPS: f64 = 1e-8;
-#
-# fn main() {
-#    // args
-#    let args: Vec<String> = args().collect();
-#    let model: usize = args[1].parse().unwrap();
-#    let sex = Sex::from(&args[2]);
-#    let rep: usize = args[3].parse().unwrap();
-#    let method = Method::FeatureMap;
-#    let _n_female = 162682;
-#    let _n_male = 121333;
-#    let n_female_over_3 = 54227;
-#    let n_male_over_3 = 40444;
-#
-#    // set up parameters
-#    let mut ns: Vec<usize> = match sex {
-#        Sex::Female => vec![
-#            2000,
-#            3000,
-#            4000,
-#            5000,
-#            6000,
-#            7000,
-#            8000,
-#            9000,
-#            10000,
-#            12000,
-#            14000,
-#            16000,
-#            18000,
-#            20000,
-#            25000,
-#            30000,
-#            35000,
-#            40000,
-#            45000,
-#            50000,
-#            n_female_over_3,
-#        ],
-#        Sex::Male => vec![
-#            2000,
-#            3000,
-#            4000,
-#            5000,
-#            6000,
-#            7000,
-#            8000,
-#            9000,
-#            10000,
-#            12000,
-#            14000,
-#            16000,
-#            18000,
-#            20000,
-#            25000,
-#            30000,
-#            35000,
-#            n_male_over_3,
-#        ],
-#    };
-#    let n_test = match sex {
-#        Sex::Female => n_female_over_3,
-#        Sex::Male => n_male_over_3,
-#    };
-#    let dry_run = false;
-#
-#    // more set-up
-#    let n_gammas = 50;
-#    let gamma_min = 1e-8;
-#    let gamma_max = 1e-2;
-#    let covs = get_covs(model);
-#    let simplex_resolution = 0.05;
-#    let a = 1.0;
-#    let p = 2;
-#    let kernel = PolynomialKernel::new(a, p);
-#    ns.sort();
-#    ns.reverse();
-#    let mut selection_results = Score2SelectionResults::new();
-#
-#    for n in ns {
-#        println!(
-#            "{}, model: {}, sex: {}, rep: {}, n: {}",
-#            Local::now(),
-#            model,
-#            sex,
-#            rep,
-#            n
-#        );
-#
-#        // get data
-#        let (data_train, data_valid, data_test, score2_rel) =
-#            get_score2_data(n, n, n_test, &covs, sex, dry_run, rep);
+import sys
+from datetime import datetime
+
+from care_survival import kernels as care_kernels
+from care_survival import score2 as care_score2
+
+
+def main():
+    # args
+    model = int(sys.argv[1])
+    sex = sys.argv[2]
+    rep = int(sys.argv[3])
+    method = "feature_map"
+    n_female = 162682
+    n_male = 121333
+    n_female_over_3 = 54227
+    n_male_over_3 = 40444
+    dry_run = True
+
+    # set up parameters
+    if dry_run:
+        ns = [10, 15, 20]
+        n_test = 20
+    else:
+        ns = [
+            2000,
+            3000,
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            12000,
+            14000,
+            16000,
+            18000,
+            20000,
+            25000,
+            30000,
+            35000,
+        ]
+        if sex == "female":
+            ns.append([40000, 45000, 50000, n_female_over_3])
+            n_test = n_female_over_3
+        elif sex == "male":
+            ns.append([n_male_over_3])
+            n_test = n_male_over_3
+
+    # more set-up
+    n_gammas = 50
+    gamma_min = 1e-8
+    gamma_max = 1e-2
+    covs = get_covs(model)
+    simplex_resolution = 0.05
+    a = 1
+    p = 2
+    kernel = care_kernels.PolynomialKernel(a, p)
+    ns.sort(reverse=True)
+    # mut selection_results = Score2SelectionResults::new();
+
+    for n in ns:
+        now = datetime.now().strftime("%H:%M:%S.%f")
+        print(f"{now}, model = {model}, sex = {sex}, rep = {rep}, n = {n}", flush=True)
+
+        # get data
+        (data_train, data_valid, data_test, score2_rel) = care_score2.get_score2_data(
+            n, n, n_test, covs, sex, dry_run, rep
+        )
+
+
 #
 #        // check SCORE2 calculation
 #        #[allow(clippy::type_complexity)]
@@ -175,28 +144,27 @@
 #        .join(file_name);
 #    selection_results.write(&path);
 # }
-#
-# fn get_covs(model: usize) -> Vec<String> {
-#    let score2_covs = [
-#        "age",
-#        "hdl",
-#        "sbp",
-#        "tchol",
-#        "smoking",
-#        "age_hdl",
-#        "age_sbp",
-#        "age_tchol",
-#        "age_smoking",
-#    ];
-#    let new_covs = match model {
-#        1 => vec![],
-#        2 => vec!["imd"],
-#        3 => vec!["imd", "pgs000018", "pgs000039"],
-#        _ => panic!(),
-#    };
-#    score2_covs
-#        .iter()
-#        .chain(new_covs.iter())
-#        .map(|&s| s.into())
-#        .collect()
-# }
+
+
+def get_covs(model):
+    score2_covs = [
+        "age",
+        "hdl",
+        "sbp",
+        "tchol",
+        "smoking",
+        "age_hdl",
+        "age_sbp",
+        "age_tchol",
+        "age_smoking",
+    ]
+    if model == 1:
+        score2_covs.append("imd")
+    elif model == 2:
+        score2_covs.append(["imd", "pgs000018", "pgs000039"])
+
+    return score2_covs
+
+
+if __name__ == "__main__":
+    main()

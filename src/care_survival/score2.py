@@ -1,7 +1,7 @@
-from care_survival import data as care_data
-
 import numpy as np
 import pandas as pd
+
+from care_survival import data as care_data
 
 
 def get_score2_data(n_train, n_valid, n_test, covs, sex, dry_run, rep):
