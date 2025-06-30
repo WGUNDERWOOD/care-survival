@@ -1,150 +1,141 @@
-##![allow(non_snake_case)]
-#
-# use dirs::home_dir;
-# use polars::prelude::*;
-# use std::fs::File;
-#
-# fn main() {
-#    let mut dir = home_dir().unwrap();
-#    dir = dir.join("rds/rds-ceu-ukbiobank-RtePkTecWB4");
-#    dir = dir.join("projects/P7439/lambertlab/wgu21/data");
-#    let path = dir.join("df_SCORE2_withexclusions.csv");
-#    let mut df = LazyCsvReader::new(path).finish().unwrap();
-#    df = df.filter(col("imd_country").eq(lit("England")));
-#    df = df
-#        .lazy()
-#        // add and rename transformed features
-#        .with_columns([
-#            ((col("ages") - lit(60.0)) / lit(5.0)).alias("cage"),
-#            ((col("hdl") - lit(1.3)) / lit(0.5)).alias("chdl"),
-#            ((col("sbp") - lit(120.0)) / lit(20.0)).alias("csbp"),
-#            ((col("tchol") - lit(6.0)) / lit(1.0)).alias("ctchol"),
-#            when(col("smallbin").eq(lit("Current")))
-#                .then(lit(1.0))
-#                .otherwise(lit(0.0))
-#                .alias("smoking"),
-#            col("eGFRcreat").alias("egfrcreat"),
-#            col("imd_min").alias("imd"),
-#            col("PGS000018").alias("pgs000018"),
-#            col("PGS000039").alias("pgs000039"),
-#            col("FOLLOWUPTIME_Incident_10year").alias("time"),
-#            col("PHENOTYPE_Incident_10year").alias("indicator"),
-#        ])
-#        // add interaction terms
-#        .with_columns([
-#            (col("cage") * col("chdl")).alias("cage_chdl"),
-#            (col("cage") * col("csbp")).alias("cage_csbp"),
-#            (col("cage") * col("ctchol")).alias("cage_ctchol"),
-#            (col("cage") * col("smoking")).alias("cage_smoking"),
-#        ])
-#        // compute SCORE2 predictions
-#        .with_column(
-#            when(col("sex").eq(lit("Male")))
-#                .then(
-#                    col("cage") * lit(1.50_f64.ln())
-#                        + col("smoking") * lit(1.77_f64.ln())
-#                        + col("csbp") * lit(1.33_f64.ln())
-#                        + col("ctchol") * lit(1.13_f64.ln())
-#                        + col("chdl") * lit(0.80_f64.ln())
-#                        + col("cage_smoking") * lit(0.92_f64.ln())
-#                        + col("cage_csbp") * lit(0.98_f64.ln())
-#                        + col("cage_ctchol") * lit(0.98_f64.ln())
-#                        + col("cage_chdl") * lit(1.04_f64.ln()),
-#                )
-#                .otherwise(
-#                    col("cage") * lit(1.64_f64.ln())
-#                        + col("smoking") * lit(2.09_f64.ln())
-#                        + col("csbp") * lit(1.39_f64.ln())
-#                        + col("ctchol") * lit(1.11_f64.ln())
-#                        + col("chdl") * lit(0.81_f64.ln())
-#                        + col("cage_smoking") * lit(0.89_f64.ln())
-#                        + col("cage_csbp") * lit(0.97_f64.ln())
-#                        + col("cage_ctchol") * lit(0.98_f64.ln())
-#                        + col("cage_chdl") * lit(1.06_f64.ln()),
-#                )
-#                .alias("score2_rel"),
-#        );
-#
-#    let rescale_cols = [
-#        "cage",
-#        "chdl",
-#        "csbp",
-#        "ctchol",
-#        "cage_chdl",
-#        "cage_csbp",
-#        "cage_ctchol",
-#        "cage_smoking",
-#        "crp",
-#        "egfrcreat",
-#        "imd",
-#        "pgs000018",
-#        "pgs000039",
-#    ];
-#
-#    let df_min = df.clone().min().collect().unwrap();
-#    let df_max = df.clone().max().collect().unwrap();
-#
-#    // rescale cols
-#    for c in rescale_cols {
-#        let col_min = df_min.column(c).unwrap().f64().unwrap().get(0).unwrap();
-#        let col_max = df_max.column(c).unwrap().f64().unwrap().get(0).unwrap();
-#        let col_range = col_max - col_min;
-#        let col_name = format!("{c}_scaled");
-#        df = df.lazy().with_columns([((col(c) - lit(col_min))
-#            / lit(col_range))
-#        .alias(col_name)]);
-#    }
-#
-#    // select and rename cols
-#    df = df.lazy().select([
-#        col("sex"),
-#        col("cage_scaled").alias("age"),
-#        col("chdl_scaled").alias("hdl"),
-#        col("csbp_scaled").alias("sbp"),
-#        col("ctchol_scaled").alias("tchol"),
-#        col("smoking"),
-#        col("cage_chdl_scaled").alias("age_hdl"),
-#        col("cage_csbp_scaled").alias("age_sbp"),
-#        col("cage_ctchol_scaled").alias("age_tchol"),
-#        col("cage_smoking_scaled").alias("age_smoking"),
-#        col("crp_scaled").alias("crp"),
-#        col("egfrcreat_scaled").alias("egfrcreat"),
-#        col("imd_scaled").alias("imd"),
-#        col("pgs000018_scaled").alias("pgs000018"),
-#        col("pgs000039_scaled").alias("pgs000039"),
-#        col("score2_rel"),
-#        (col("time") / lit(10.0)).alias("time"),
-#        (lit(1.0) - col("indicator"))
-#            .cast(DataType::Boolean)
-#            .alias("censored"),
-#    ]);
-#
-#    let df_male = df
-#        .clone()
-#        .filter(col("sex").eq(lit("Male")))
-#        .drop([col("sex")])
-#        .drop_nulls(None);
-#    let df_female = df
-#        .clone()
-#        .filter(col("sex").eq(lit("Female")))
-#        .drop([col("sex")])
-#        .drop_nulls(None);
-#
-#    let out_path_male = dir.join("df_scaled_male.csv");
-#    let out_path_female = dir.join("df_scaled_female.csv");
-#
-#    let mut out_file_male = File::create(out_path_male).unwrap();
-#    let mut out_file_female = File::create(out_path_female).unwrap();
-#
-#    CsvWriter::new(&mut out_file_male)
-#        .include_header(true)
-#        .with_separator(b',')
-#        .finish(&mut df_male.collect().unwrap())
-#        .unwrap();
-#
-#    CsvWriter::new(&mut out_file_female)
-#        .include_header(true)
-#        .with_separator(b',')
-#        .finish(&mut df_female.collect().unwrap())
-#        .unwrap();
-# }
+import numpy as np
+import pandas as pd
+
+
+def main():
+    directory = "~/rds/rds-ceu-ukbiobank-RtePkTecWB4"
+    directory += "projects/P7439/lambertlab/wgu21/data"
+    path = directory + "df_SCORE2_withexclusions.csv"
+    df = pd.read_csv(path)
+    df = df[df["imd_country"] == "England"]
+
+    # transform columns
+    df["cage"] = (df["ages"] - 60) / 5
+    df["chdl"] = (df["hdl"] - 1.3) / 0.5
+    df["csbp"] = (df["sbp"] - 120) / 20
+    df["ctchol"] = (df["tchol"] - 6) / 1
+    df["smoking"] = (df["smallbin"] == "Current") * 1
+    df["egfrcreat"] = df["eGFRcreat"]
+    df["imd"] = df["imd_min"]
+    df["pgs000018"] = df["PGS000018"]
+    df["pgs000039"] = df["PGS000039"]
+    df["time"] = df["FOLLOWUPTIME_Incident_10year"]
+    df["indicator"] = df["PHENOTYPE_Incident_10year"]
+    df["score2_rel"] = np.nan
+
+    # add interaction terms
+    df["cage_chdl"] = df["cage"] * df["chdl"]
+    df["cage_csbp"] = df["cage"] * df["csbp"]
+    df["cage_ctchol"] = df["cage"] * df["ctchol"]
+    df["cage_smoking"] = df["cage"] * df["smoking"]
+
+    # add SCORE2 relative risk
+    for i, row in df.iterrows():
+        lp = 0
+        cage = row["cage"]
+        smoking = int(row["smoking"])
+        csbp = row["csbp"]
+        ctchol = row["ctchol"]
+        chdl = row["chdl"]
+
+        if row["sex"] == "Male":
+            lp += cage * np.log(1.50)
+            lp += smoking * np.log(1.77)
+            lp += csbp * np.log(1.33)
+            lp += ctchol * np.log(1.13)
+            lp += chdl * np.log(0.80)
+            lp += cage * smoking * np.log(0.92)
+            lp += cage * csbp * np.log(0.98)
+            lp += cage * ctchol * np.log(0.98)
+            lp += cage * chdl * np.log(1.04)
+
+        else:
+            lp += cage * np.log(1.64)
+            lp += smoking * np.log(2.09)
+            lp += csbp * np.log(1.39)
+            lp += ctchol * np.log(1.11)
+            lp += chdl * np.log(0.81)
+            lp += cage * smoking * np.log(0.89)
+            lp += cage * csbp * np.log(0.97)
+            lp += cage * ctchol * np.log(0.98)
+            lp += cage * chdl * np.log(1.06)
+
+        df.loc[i, "score2_rel"] = lp
+
+    # rescale columns
+    rescale_cols = [
+        "cage",
+        "chdl",
+        "csbp",
+        "ctchol",
+        "cage_chdl",
+        "cage_csbp",
+        "cage_ctchol",
+        "cage_smoking",
+        "crp",
+        "egfrcreat",
+        "imd",
+        "pgs000018",
+        "pgs000039",
+    ]
+    df_min = df.min(axis=0)
+    df_max = df.max(axis=0)
+
+    for c in rescale_cols:
+        col_min = df_min[c]
+        col_max = df_max[c]
+        col_range = col_max - col_min
+        col_name = f"{c}_scaled"
+        df[col_name] = (df[c] - col_min) / col_range
+
+    # select and rename cols
+    df["age"] = df["cage_scaled"]
+    df["hdl"] = df["chdl_scaled"]
+    df["sbp"] = df["csbp_scaled"]
+    df["tchol"] = df["ctchol_scaled"]
+    df["age_hdl"] = df["cage_chdl_scaled"]
+    df["age_sbp"] = df["cage_csbp_scaled"]
+    df["age_tchol"] = df["cage_ctchol_scaled"]
+    df["age_smoking"] = df["cage_smoking_scaled"]
+    df["crp"] = df["crp_scaled"]
+    df["egfrcreat"] = df["egfrcreat_scaled"]
+    df["imd"] = df["imd_scaled"]
+    df["pgs000018"] = df["pgs000018_scaled"]
+    df["pgs000039"] = df["pgs000039_scaled"]
+    df["time"] = df["time"] / 10
+    df["censored"] = 1 - df["indicator"]
+
+    final_cols = [
+        "sex",
+        "age",
+        "hdl",
+        "sbp",
+        "tchol",
+        "smoking",
+        "age_hdl",
+        "age_sbp",
+        "age_tchol",
+        "age_smoking",
+        "crp",
+        "egfrcreat",
+        "imd",
+        "pgs000018",
+        "pgs000039",
+        "score2_rel",
+        "time",
+        "censored",
+    ]
+
+    df = df[final_cols]
+
+    df_female = df[df["sex"] == "Female"]
+    df_female = df_female.drop("sex").dropna()
+
+    df_male = df[df["sex"] == "Male"]
+    df_male = df_male.drop("sex").dropna()
+
+    out_path_male = directory + "df_scaled_male.csv"
+    out_path_female = directory + "df_scaled_female.csv"
+
+    df_female.to_csv(out_path_female)
+    df_male.to_csv(out_path_male)

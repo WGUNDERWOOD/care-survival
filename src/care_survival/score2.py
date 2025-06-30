@@ -14,14 +14,7 @@ def get_score2_data(n_train, n_valid, n_test, covs, sex, dry_run, rep):
         path += f"P7439/lambertlab/wgu21/data/df_scaled_{sex}.csv"
         file = pd.read_csv(path)
 
-    n = n_train + n_valid + n_test
     n_avail = len(file)
-
-    # CSV format: X1, ..., Xd, score2_rel, T, I
-    d_all = file.shape[1] - 3
-    all_covs = file.columns[0:d_all]
-    cov_indices = [i for i in range(d_all) if all_covs[i] in covs]
-    d = len(cov_indices)
 
     # get a random ordering of all the samples
     np.random.seed(0)
@@ -65,7 +58,7 @@ def get_score2_data(n_train, n_valid, n_test, covs, sex, dry_run, rep):
         X[test_is], T[test_is], I[test_is], score2_rel[test_is], f_0
     )
 
-    return (data_train, data_valid, data_test, score2_rel)
+    return (data_train, data_valid, data_test)
 
 
 ##[must_use]

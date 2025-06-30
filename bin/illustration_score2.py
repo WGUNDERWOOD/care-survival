@@ -31,7 +31,7 @@ def main():
     method = "feature_map"
 
     rep = 0
-    data_train, data_valid, data_test, score2_rel = care_score2.get_score2_data(
+    data_train, data_valid, data_test = care_score2.get_score2_data(
         n_train, n_valid, n_test, covs, sex, dry_run, rep
     )
 
@@ -55,10 +55,10 @@ def main():
     high_is = [i for i in range(n_train) if X[i, 0] >= imd_med]
     low_is = [i for i in range(n_train) if X[i, 0] < imd_med]
     data_train_high = care_data.Data(
-        X[high_is], T[high_is], I[high_is], score2_rel[high_is], f_0[high_is]
+        X[high_is], T[high_is], I[high_is], f_tilde[high_is], f_0[high_is]
     )
     data_train_low = care_data.Data(
-        X[low_is], T[low_is], I[low_is], score2_rel[low_is], f_0[low_is]
+        X[low_is], T[low_is], I[low_is], f_tilde[low_is], f_0[low_is]
     )
     embedding_high = care_embedding.Embedding(
         data_train_high, data_valid, data_test, kernel, method

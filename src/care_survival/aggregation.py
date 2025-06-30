@@ -100,6 +100,11 @@ class CARE:
             "l2_dagger": dagger.score["l2"]["test"],
             "l2_check": check.score["l2"]["test"],
             "l2_tilde": tilde.score["l2"]["test"],
+            "concordance_star": star.score["concordance"]["test"],
+            "concordance_hat": hat.score["concordance"]["test"],
+            "concordance_dagger": dagger.score["concordance"]["test"],
+            "concordance_check": check.score["concordance"]["test"],
+            "concordance_tilde": tilde.score["concordance"]["test"],
         }
 
 

@@ -1,25 +1,30 @@
 import sys
+import os
+import pandas as pd
 from datetime import datetime
 
+from care_survival import aggregation as care_aggregation
+from care_survival import embedding as care_embedding
 from care_survival import kernels as care_kernels
 from care_survival import score2 as care_score2
 
 
 def main():
     # args
+    today = datetime.now().strftime("%Y-%m-%d")
     model = int(sys.argv[1])
     sex = sys.argv[2]
     rep = int(sys.argv[3])
     method = "feature_map"
-    n_female = 162682
-    n_male = 121333
+    _n_female = 162682
+    _n_male = 121333
     n_female_over_3 = 54227
     n_male_over_3 = 40444
     dry_run = True
 
     # set up parameters
     if dry_run:
-        ns = [10, 15, 20]
+        ns = [10, 20]
         n_test = 20
     else:
         ns = [
@@ -57,93 +62,40 @@ def main():
     a = 1
     p = 2
     kernel = care_kernels.PolynomialKernel(a, p)
+    with_concordance = ["test"]
+    verbose = False
     ns.sort(reverse=True)
-    # mut selection_results = Score2SelectionResults::new();
+    cares = []
 
     for n in ns:
         now = datetime.now().strftime("%H:%M:%S.%f")
         print(f"{now}, model = {model}, sex = {sex}, rep = {rep}, n = {n}", flush=True)
 
         # get data
-        (data_train, data_valid, data_test, score2_rel) = care_score2.get_score2_data(
+        (data_train, data_valid, data_test) = care_score2.get_score2_data(
             n, n, n_test, covs, sex, dry_run, rep
         )
+        embedding = care_embedding.Embedding(
+            data_train, data_valid, data_test, kernel, method
+        )
 
+        # fit care estimator
+        care = care_aggregation.CARE(
+            embedding,
+            gamma_min,
+            gamma_max,
+            n_gammas,
+            simplex_resolution,
+            with_concordance,
+            verbose,
+        )
+        care.fit()
+        cares.append(care)
 
-#
-#        // check SCORE2 calculation
-#        #[allow(clippy::type_complexity)]
-#        let f_tilde: Box<dyn Fn(ArrayView1<f64>) -> f64> =
-#            Box::new(move |x: ArrayView1<f64>| -> f64 {
-#                get_score2_rel(x, sex)
-#            });
-#        let calculated_score2_rel = data_test.X.map_axis(Axis(1), &f_tilde);
-#        if !dry_run {
-#            for i in 0..n_test {
-#                assert!((score2_rel[i] - calculated_score2_rel[i]).abs() < EPS);
-#            }
-#        }
-#
-#        // embedding
-#        let embedding = Embedding::new(
-#            &data_train,
-#            &data_valid,
-#            &data_test,
-#            &kernel,
-#            method,
-#        );
-#
-#        // run model selection
-#        let external = External::new(&embedding, &f_tilde);
-#        let externals = vec![external];
-#        let mut selection = ModelSelection::new(
-#            &embedding,
-#            gamma_min,
-#            gamma_max,
-#            n_gammas,
-#            simplex_resolution,
-#            &externals,
-#        );
-#        selection.select();
-#
-#        // extract values
-#        selection_results.model = Some(model);
-#        selection_results.sex = Some(sex);
-#        selection_results.rep = Some(rep);
-#        selection_results.ns.push(n);
-#        selection_results.gamma_hats.push(selection.get_gamma_hat());
-#        selection_results
-#            .gamma_checks
-#            .push(selection.get_gamma_check());
-#        selection_results
-#            .theta_checks
-#            .push(selection.get_theta_check()[0]);
-#        selection_results.ln_hats.push(selection.get_ln_hat());
-#        selection_results.ln_checks.push(selection.get_ln_check());
-#        selection_results.ln_tildes.push(selection.get_ln_tilde());
-#        selection_results
-#            .concordance_hats
-#            .push(selection.get_concordance_hat());
-#        selection_results
-#            .concordance_checks
-#            .push(selection.get_concordance_check());
-#        selection_results
-#            .concordance_tildes
-#            .push(selection.get_concordance_tilde());
-#    }
-#
-#    // save data
-#    let file_name =
-#        format!("analysis_score2_model_{model}_{sex}_rep_{rep}.csv");
-#    let path = current_dir()
-#        .unwrap()
-#        .join("data")
-#        .join(format!("{}", Local::now().format("%Y-%m-%d")))
-#        .join("score2")
-#        .join("analysis")
-#        .join(file_name);
-#    selection_results.write(&path);
-# }
+    # write summary results
+    path = f"./data/{today}/score2/analysis/"
+    path += f"analysis_score2_model_{model}_{sex}_rep_{rep}.csv"
+    write_summary(cares, rep, model, sex, path)
 
 
 def get_covs(model):
@@ -164,6 +116,34 @@ def get_covs(model):
         score2_covs.append(["imd", "pgs000018", "pgs000039"])
 
     return score2_covs
+
+
+def write_summary(cares, rep, model, sex, path):
+    results = pd.concat([pd.DataFrame(c.summary) for c in cares], axis=0)
+    results["n"] = results.n_train
+    results["model"] = model
+    results["sex"] = sex
+    results["rep"] = rep
+    results = results.drop(
+        [
+            "n_train",
+            "n_valid",
+            "n_test",
+            "gamma_star",
+            "gamma_dagger",
+            "theta_dagger",
+            "l2_star",
+            "l2_hat",
+            "l2_dagger",
+            "l2_check",
+            "l2_tilde",
+            "concordance_star",
+            "concordance_dagger",
+        ],
+        axis=1,
+    )
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    results.to_csv(path)
 
 
 if __name__ == "__main__":

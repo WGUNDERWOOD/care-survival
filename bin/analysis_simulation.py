@@ -72,7 +72,8 @@ def main():
         cares.append(care)
 
     # write summary results
-    path = f"./data/{today}/simulation/analysis/analysis_simulation_dgp_{dgp}_rep_{rep}.csv"
+    path = f"./data/{today}/simulation/analysis/"
+    path += f"analysis_simulation_dgp_{dgp}_rep_{rep}.csv"
     write_summary(cares, rep, path)
 
 
