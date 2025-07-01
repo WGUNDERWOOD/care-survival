@@ -99,6 +99,12 @@ print("concordance index:", best.score["concordance"]["valid"])
 
 ## Publishing to PyPI
 
+First build the package with
+
+```
+uv build
+```
+
 To publish to TestPyPI with an API token, run
 
 ```
