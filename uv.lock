@@ -9,7 +9,7 @@ resolution-markers = [
 
 [[package]]
 name = "care-survival"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
@@ -99,7 +99,7 @@ wheels = [
 [[package]]
 name = "cycler"
 version = "0.12.1"
-source = { registry = "https://test.pypi.org/simple/" }
+source = { registry = "https://test.pypi.org/simple" }
 wheels = [
     { url = "https://test-files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl", hash = "sha256:85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30", size = 8321, upload-time = "2024-07-22T15:29:47.554Z" },
 ]
@@ -559,7 +559,7 @@ wheels = [
 [[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
-source = { registry = "https://test.pypi.org/simple/" }
+source = { registry = "https://test.pypi.org/simple" }
 dependencies = [
     { name = "six" },
 ]
@@ -699,7 +699,7 @@ wheels = [
 [[package]]
 name = "tzdata"
 version = "2025.2"
-source = { registry = "https://test.pypi.org/simple/" }
+source = { registry = "https://test.pypi.org/simple" }
 sdist = { url = "https://test-files.pythonhosted.org/packages/49/36/7d64c73271c2caae770f9c15bfc7cccb29d62331ba4de8374515dca5f18d/tzdata-2025.2.tar.gz", hash = "sha256:b9eb16caba308faaee9460642ce25f2bc8779da91339f6396f13bcdc453163b5", size = 196429, upload-time = "2025-03-23T13:53:04.936Z" }
 wheels = [
     { url = "https://test-files.pythonhosted.org/packages/4b/9a/d89cb4911a6587065adf0d739f4b7ec251b82041ee4ce6dada311b1f54ec/tzdata-2025.2-py2.py3-none-any.whl", hash = "sha256:e3ea96ff025e62a08ee02e83f543ef830d059ff98e10524d5c021679348cfba8", size = 347839, upload-time = "2025-03-23T13:53:03.848Z" },
