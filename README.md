@@ -4,8 +4,7 @@ Upgrading survival models with CARE.
 
 This repository contains a Python implementation
 of the methodology proposed by
-[Underwood, Reeve, Feng, Lambert, Mukherjee and Samworth, 2025]
-(https://arxiv.org/abs/2506.23870).
+[Underwood, Reeve, Feng, Lambert, Mukherjee and Samworth, 2025](https://arxiv.org/abs/2506.23870).
 
 ## Building the Python package
 
