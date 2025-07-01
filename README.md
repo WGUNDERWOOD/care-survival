@@ -2,6 +2,11 @@
 
 Upgrading survival models with CARE.
 
+This repository contains a Python implementation
+of the methodology proposed by
+[Underwood, Reeve, Feng, Lambert, Mukherjee and Samworth, 2025]
+(https://arxiv.org/abs/2506.23870).
+
 ## Building the Python package
 
 This project uses
@@ -12,10 +17,10 @@ To update the lockfile, use `uv lock`.
 
 ## Running the simulation scripts
 
-This project uses
+For running scripts,
 [just](https://github.com/casey/just)
 and [parallel](https://www.gnu.org/software/parallel/)
-to run scripts.
+should be installed.
 To execute all of the simulations and generate the plots,
 run `just`.
 The recipes can be found in the
