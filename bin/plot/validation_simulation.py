@@ -9,7 +9,8 @@ common.init()
 def plot_validation(csv_path, plot_path, dgp):
     df = pd.read_csv(csv_path)
     df = df.sort_values(by="gamma")
-    (fig, ax) = plt.subplots(figsize=(4, 3))
+    #(fig, ax) = plt.subplots(figsize=(4, 3))
+    (fig, ax) = plt.subplots(figsize=(3, 3.6))
 
     # validation curves
     plt.plot(

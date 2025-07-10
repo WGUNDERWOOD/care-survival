@@ -52,6 +52,7 @@
       default = pkgs.mkShell {
         packages = [
           python
+          pkgs.parallel
           pkgs.uv
         ];
         env =
