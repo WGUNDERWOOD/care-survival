@@ -5,6 +5,8 @@ from care_survival import convex as care_convex
 from care_survival import kernel_estimator as care_kernel_estimator
 from care_survival import metrics as care_metrics
 
+class CARE2:
+    pass
 
 class CARE:
     def __init__(

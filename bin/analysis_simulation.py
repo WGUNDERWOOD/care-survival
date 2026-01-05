@@ -17,28 +17,30 @@ def main():
 
     ns = [
         10,
-        15,
-        20,
-        25,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100,
-        120,
-        150,
-        200,
-        250,
-        300,
-        350,
-        400,
-        450,
-        500,
+        #15,
+        #20,
+        #25,
+        #30,
+        #40,
+        #50,
+        #60,
+        #70,
+        #80,
+        ##90,
+        ##100,
+        ##120,
+        ##150,
+        ##200,
+        ##250,
+        ##300,
+        ##350,
+        ##400,
+        ##450,
+        ##500,
     ]
-    n_test = 500
+    ##n_test = 500
+    #n_test = 100
+    n_test = 10
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
@@ -48,11 +50,12 @@ def main():
     gamma_max = 1e1
     ns.sort(reverse=True)
     method = "kernel"
-    simplex_resolution = 0.05
+    simplex_resolution = 0.1
     np.random.seed(rep)
     with_concordance = []
     verbose = False
     cares = []
+    care2s = []
 
     for n in ns:
         now = datetime.now().strftime("%H:%M:%S.%f")
@@ -78,10 +81,28 @@ def main():
         care.fit()
         cares.append(care)
 
-    # write summary results
+        # fit care2 estimator
+        care2 = care_aggregation.CARE2(
+            embedding,
+            gamma_min,
+            gamma_max,
+            n_gammas,
+            simplex_resolution,
+            with_concordance,
+            verbose,
+        )
+        care2.fit()
+        care2s.append(care)
+
+    # write CARE summary results
     path = f"./data/{today}/simulation/analysis/"
     path += f"analysis_simulation_dgp_{dgp}_rep_{rep}.csv"
     write_summary(cares, rep, path)
+
+    # write CARE2 summary results
+    path2 = f"./data/{today}/simulation/analysis/"
+    path2 += f"analysis_simulation_dgp_{dgp}_rep_{rep}_CARE2.csv"
+    write_summary(care2s, rep, path2)
 
 
 def write_summary(cares, rep, path):
