@@ -28,84 +28,105 @@ class KernelEstimatorCARE2:
 
         return matrix @ beta + self.f_tilde @ theta
 
-    #def get_ln_split(self, beta, split):
-    #    f = self.get_f(beta, split)
-    #    return care_metrics.get_ln_split(f, self.embedding, split)
+    def get_ln_split(self, beta, theta, split):
+        f = self.get_f(beta, theta, split)
+        return care_metrics.get_ln_split(f, self.embedding, split)
 
-    #def get_lng_split(self, beta, split):
-    #    ln = self.get_ln_split(beta, split)
+    def get_lng_split(self, beta, theta, split):
+        ln = self.get_ln_split(beta, theta, split)
 
-    #    if self.method == "kernel":
-    #        K_hat_train = self.embedding.data["train"].K_hat
-    #        penalty = self.gamma * beta.T @ K_hat_train @ beta
+        if self.method == "kernel":
+            K_hat_train = self.embedding.data["train"].K_hat
+            penalty = self.gamma * beta.T @ K_hat_train @ beta
 
-    #    elif self.method == "feature_map":
-    #        Phi_bar = self.embedding.data["train"].Phi_bar
-    #        feature_const = self.embedding.data["train"].feature_const
-    #        beta_0 = -beta @ Phi_bar / feature_const
-    #        penalty = self.gamma * np.sum(beta**2) + beta_0**2
+        elif self.method == "feature_map":
+            Phi_bar = self.embedding.data["train"].Phi_bar
+            feature_const = self.embedding.data["train"].feature_const
+            beta_0 = -beta @ Phi_bar / feature_const
+            penalty = self.gamma * np.sum(beta**2) + beta_0**2
 
-    #    lng = ln + penalty
-    #    return lng
+        lng = ln + penalty
+        return lng
 
-    #def get_dlng_split(self, beta, split):
-    #    embedding_data = self.embedding.data[split]
-    #    f = self.get_f(beta, split)
-    #    f_max = np.max(f)
-    #    f_expt = expt(f, f_max)
-    #    sn = get_sn(embedding_data, f_expt)
-    #    Dsn = get_Dsn(embedding_data, f_expt)
-    #    n = embedding_data.n
-    #    N = embedding_data.N
+    def get_dlng_split(self, beta, theta, split):
+        embedding_data = self.embedding.data[split]
+        f = self.get_f(beta, theta, split)
+        f_max = np.max(f)
+        f_expt = expt(f, f_max)
+        sn = get_sn(embedding_data, f_expt)
+        Dsn = get_Dsn(embedding_data, f_expt)
+        Dsn_beta = Dsn[0]
+        Dsn_theta = Dsn[1]
+        n = embedding_data.n
+        N = embedding_data.N
 
-    #    if self.method == "kernel":
-    #        K_tilde = embedding_data.K_tilde
-    #        K_hat = embedding_data.K_hat
-    #        dlng = np.sum(
-    #            (Dsn.T / sn - K_tilde.T) * N / n + 2 * self.gamma * K_hat.T * beta,
-    #            axis=1,
-    #        )
+        if self.method == "kernel":
+            K_tilde = embedding_data.K_tilde
+            K_hat = embedding_data.K_hat
+            dlng_beta = np.sum(
+                (Dsn_beta.T / sn - K_tilde.T) * N / n
+                + 2 * self.gamma * K_hat.T * beta,
+                axis=1,
+            )
 
-    #    elif self.method == "feature_map":
-    #        Phi_tilde = embedding_data.Phi_tilde
-    #        Phi_bar = embedding_data.Phi_bar
-    #        feature_const = embedding_data.feature_const
-    #        beta_0 = -beta @ Phi_bar / feature_const
-    #        dlng = (
-    #            np.sum((Dsn.T / sn - Phi_tilde.T) * N / n, axis=1)
-    #            + 2 * self.gamma * beta
-    #            - 2 * self.gamma * Phi_bar * beta_0 / feature_const
-    #        )
+        elif self.method == "feature_map":
+            Phi_tilde = embedding_data.Phi_tilde
+            Phi_bar = embedding_data.Phi_bar
+            feature_const = embedding_data.feature_const
+            beta_0 = -beta @ Phi_bar / feature_const
+            dlng_beta = (
+                np.sum((Dsn_beta.T / sn - Phi_tilde.T) * N / n, axis=1)
+                + 2 * self.gamma * beta
+                - 2 * self.gamma * Phi_bar * beta_0 / feature_const
+            )
 
-    #    return dlng
+        dlng_theta = np.sum(
+            (Dsn_theta.T / sn - f_tilde.T) * N / n,
+            axis=1,
+        )
 
-    #def fit(self, beta_init, inv_hessian_init):
-    #    def cost(beta):
-    #        return self.get_lng_split(beta, "train")
+        return dln_beta, dlng_theta
 
-    #    def gradient(beta):
-    #        return self.get_dlng_split(beta, "train")
+    def fit(self, init, inv_hessian_init):
 
-    #    if beta_init is None:
-    #        beta_init = self.embedding.data["train"].get_default_beta()
-    #    if inv_hessian_init is None:
-    #        inv_hessian_init = self.embedding.data["train"].get_default_inv_hessian()
+        n = self.embedding.data["train"].n
+        p = self.embedding.data["train"].f_tilde.shape[1]
 
-    #    gtol = 1e-6
-    #    res = minimize(
-    #        cost,
-    #        beta_init,
-    #        method="BFGS",
-    #        jac=gradient,
-    #        options={"hess_inv0": inv_hessian_init, "gtol": gtol},
-    #    )
+        def cost(param):
+            beta = param[0:n]
+            theta = param[n:]
+            return self.get_lng_split(beta, theta, "train")
 
-    #    self.beta_hat = res.x
-    #    self.inv_hessian_hat = (res.hess_inv + res.hess_inv.T) / 2
+        def gradient(param):
+            beta = param[0:n]
+            theta = param[n:]
+            return self.get_dlng_split(beta, theta, "train")
 
-    #    self.f_hat = {}
-    #    for split in care_metrics.get_splits():
-    #        self.f_hat[split] = self.get_f(self.beta_hat, split)
+        if init is None:
+            beta_init = self.embedding.data["train"].get_default_beta()
+            theta_init = np.zeros(p)
+            init = np.concatenate(beta_init, theta_init)
+        if inv_hessian_init is None:
+            inv_hessian_beta_init = self.embedding.data["train"].get_default_inv_hessian()
+            inv_hessian_theta_init = np.eye(p)
+            init = scipy.linalg.block_diag(inv_hessian_beta_init, inv_hessian_theta_init)
+
+        gtol = 1e-6
+        res = minimize(
+            cost,
+            init,
+            method="BFGS",
+            jac=gradient,
+            options={"hess_inv0": inv_hessian_init, "gtol": gtol},
+        )
+
+        self.beta_hat = res.x[0:n]
+        self.theta_hat = res.x[n:]
+        self.inv_hessian_hat = (res.hess_inv + res.hess_inv.T) / 2
+
+        self.f_hat = {}
+        for split in care_metrics.get_splits():
+            self.f_hat[split] = self.get_f(self.beta_hat, split)
 
 def expt(f, f_max):
     return np.exp(f - f_max)
@@ -121,15 +142,18 @@ def get_sn(embedding_data, f_expt):
 def get_Dsn(embedding_data, f_expt):
     n = embedding_data.n
     R = embedding_data.R.astype(int)
+    A = (R.reshape(-1, 1) <= counter) * f_expt / n
 
     if embedding_data.method == "kernel":
         K_tilde = embedding_data.K_tilde
         counter = np.array(np.arange(n))
-        A = (R.reshape(-1, 1) <= counter) * f_expt / n
-        return A @ K_tilde
+        Dsn_beta = A @ K_tilde
 
     elif embedding_data.method == "feature_map":
         Phi_tilde = embedding_data.Phi_tilde
-        A = Phi_tilde * f_expt.reshape(-1, 1)
-        B = np.cumsum(A[::-1, :], axis=0) / n
-        return B[n - R - 1, :]
+        B = Phi_tilde * f_expt.reshape(-1, 1)
+        C = np.cumsum(B[::-1, :], axis=0) / n
+        Dsn_beta = C[n - R - 1, :]
+
+    Dsn_theta = A @ f_tilde
+    return Dsn_beta, Dsn_theta

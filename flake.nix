@@ -53,6 +53,7 @@
         packages = [
           python
           pkgs.parallel
+          pkgs.ruff
           pkgs.uv
         ];
         env =
