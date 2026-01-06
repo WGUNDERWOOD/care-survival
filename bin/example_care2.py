@@ -20,11 +20,12 @@ T_valid = T[n_train:n]
 I_valid = I[n_train:n]
 f_valid = f[n_train:n]
 
-# define a kernel and use the kernel optimisation method
+# define a kernel
 a = 1
 p = 2
 kernel = care_survival.PolynomialKernel(a, p)
 method = "kernel"
+#method = "feature_map"
 
 # set up the kernel tuning parameters
 n_gammas = 20
@@ -34,25 +35,27 @@ gamma_max = 1e1
 # compute concordance score on all data
 with_concordance = ["train", "valid"]
 
+# embedding
+embedding = care_survival.embed(
+    X_train,
+    T_train,
+    I_train,
+    f_train,
+    X_valid,
+    T_valid,
+    I_valid,
+    f_valid,
+    kernel,
+    method,
+)
+
 # fit CARE2
-#care = care_survival.care(
-#    X_train,
-#    T_train,
-#    I_train,
-#    f_train,
-#    X_valid,
-#    T_valid,
-#    I_valid,
-#    f_valid,
-#    kernel,
-#    method,
-#    n_gammas,
-#    gamma_min,
-#    gamma_max,
-#    simplex_resolution,
-#    with_concordance,
-#)
-#
+gamma = 0.1
+kernel_estimator = care_survival.KernelEstimatorCARE2(
+    embedding, gamma, with_concordance
+    )
+kernel_estimator.fit(None, None)
+
 ## view diagnostics
 #best = care.best["aggregated"]["ln"]["valid"]
 #print("best theta value:", best.theta)

@@ -4,8 +4,7 @@ from care_survival import data as care_data
 from care_survival import embedding as care_embedding
 from care_survival import aggregation as care_aggregation
 
-
-def care(
+def embed(
     X_train,
     T_train,
     I_train,
@@ -16,12 +15,6 @@ def care(
     f_valid,
     kernel,
     method,
-    n_gammas,
-    gamma_min,
-    gamma_max,
-    simplex_resolution,
-    with_concordance,
-    verbose=False,
 ):
     # get parameters from shape of data
     n_train = X_train.shape[0]
@@ -56,6 +49,30 @@ def care(
     embedding = care_embedding.Embedding(
         data_train, data_valid, data_test, kernel, method
     )
+
+    return embedding
+
+
+def care(
+    X_train,
+    T_train,
+    I_train,
+    f_train,
+    X_valid,
+    T_valid,
+    I_valid,
+    f_valid,
+    kernel,
+    method,
+    n_gammas,
+    gamma_min,
+    gamma_max,
+    simplex_resolution,
+    with_concordance,
+    verbose=False,
+):
+    embedding = embed(X_train, T_train, I_train, f_train, X_valid, T_valid,
+                      I_valid, f_valid, kernel, method)
 
     # fit CARE estimator
     care = care_aggregation.CARE(

@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.optimize import minimize
+from scipy.linalg import block_diag
 
 from care_survival import metrics as care_metrics
 
@@ -26,7 +27,8 @@ class KernelEstimatorCARE2:
         elif self.method == "feature_map":
             matrix = self.embedding.data[split].Phi_tilde
 
-        return matrix @ beta + self.f_tilde @ theta
+        f_tilde = self.embedding.data[split].f_tilde
+        return matrix @ beta + f_tilde @ theta
 
     def get_ln_split(self, beta, theta, split):
         f = self.get_f(beta, theta, split)
@@ -80,12 +82,13 @@ class KernelEstimatorCARE2:
                 - 2 * self.gamma * Phi_bar * beta_0 / feature_const
             )
 
+        f_tilde = self.embedding.data["train"].f_tilde
         dlng_theta = np.sum(
             (Dsn_theta.T / sn - f_tilde.T) * N / n,
             axis=1,
         )
 
-        return dln_beta, dlng_theta
+        return dlng_beta, dlng_theta
 
     def fit(self, init, inv_hessian_init):
 
@@ -100,16 +103,19 @@ class KernelEstimatorCARE2:
         def gradient(param):
             beta = param[0:n]
             theta = param[n:]
-            return self.get_dlng_split(beta, theta, "train")
+            dlng = self.get_dlng_split(beta, theta, "train")
+            dlng_beta = dlng[0]
+            dlng_theta = dlng[1]
+            return np.concatenate((dlng_beta, dlng_theta))
 
         if init is None:
             beta_init = self.embedding.data["train"].get_default_beta()
             theta_init = np.zeros(p)
-            init = np.concatenate(beta_init, theta_init)
+            init = np.concatenate((beta_init, theta_init))
         if inv_hessian_init is None:
             inv_hessian_beta_init = self.embedding.data["train"].get_default_inv_hessian()
             inv_hessian_theta_init = np.eye(p)
-            init = scipy.linalg.block_diag(inv_hessian_beta_init, inv_hessian_theta_init)
+            inv_hessian_init = block_diag(inv_hessian_beta_init, inv_hessian_theta_init)
 
         gtol = 1e-6
         res = minimize(
@@ -122,11 +128,14 @@ class KernelEstimatorCARE2:
 
         self.beta_hat = res.x[0:n]
         self.theta_hat = res.x[n:]
+        print(self.beta_hat)
+        print(self.theta_hat)
         self.inv_hessian_hat = (res.hess_inv + res.hess_inv.T) / 2
 
         self.f_hat = {}
         for split in care_metrics.get_splits():
-            self.f_hat[split] = self.get_f(self.beta_hat, split)
+            self.f_hat[split] = self.get_f(self.beta_hat, self.theta_hat, split)
+
 
 def expt(f, f_max):
     return np.exp(f - f_max)
@@ -142,11 +151,11 @@ def get_sn(embedding_data, f_expt):
 def get_Dsn(embedding_data, f_expt):
     n = embedding_data.n
     R = embedding_data.R.astype(int)
+    counter = np.array(np.arange(n))
     A = (R.reshape(-1, 1) <= counter) * f_expt / n
 
     if embedding_data.method == "kernel":
         K_tilde = embedding_data.K_tilde
-        counter = np.array(np.arange(n))
         Dsn_beta = A @ K_tilde
 
     elif embedding_data.method == "feature_map":
@@ -155,5 +164,5 @@ def get_Dsn(embedding_data, f_expt):
         C = np.cumsum(B[::-1, :], axis=0) / n
         Dsn_beta = C[n - R - 1, :]
 
-    Dsn_theta = A @ f_tilde
+    Dsn_theta = A @ embedding_data.f_tilde
     return Dsn_beta, Dsn_theta
