@@ -16,20 +16,20 @@ def main():
     today = datetime.now().strftime("%Y-%m-%d")
 
     ns = [
-        10,
+        #10,
         #15,
         #20,
         #25,
-        #30,
-        #40,
-        #50,
-        #60,
-        #70,
-        #80,
-        ##90,
-        ##100,
-        ##120,
-        ##150,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        #120,
+        #150,
         ##200,
         ##250,
         ##300,
@@ -39,13 +39,14 @@ def main():
         ##500,
     ]
     ##n_test = 500
-    #n_test = 100
-    n_test = 10
+    n_test = 100
+    #n_test = 10
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
     kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
-    n_gammas = 5
+    #n_gammas = 5
+    n_gammas = 50
     gamma_min = 1e-5
     gamma_max = 1e1
     ns.sort(reverse=True)
@@ -53,6 +54,7 @@ def main():
     simplex_resolution = 0.1
     np.random.seed(rep)
     with_concordance = []
+    #verbose = True
     verbose = False
     cares = []
     care2s = []
@@ -87,12 +89,11 @@ def main():
             gamma_min,
             gamma_max,
             n_gammas,
-            simplex_resolution,
             with_concordance,
             verbose,
         )
         care2.fit()
-        care2s.append(care)
+        care2s.append(care2)
 
     # write CARE summary results
     path = f"./data/{today}/simulation/analysis/"

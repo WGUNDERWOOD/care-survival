@@ -1,7 +1,7 @@
 #REPS_SIM := "100"
-REPS_SIM := "1"
+REPS_SIM := "100"
 REPS_SCORE2 := "2"
-DATE := "2026-01-05"
+DATE := "2026-01-07"
 
 default: simulation plot_simulation
 
@@ -34,14 +34,14 @@ analysis_score2:
 plot_simulation:
     parallel --bar --lb uv run bin/plot/{1}.py {{DATE}} ::: \
         aggregation_simulation \
-        breslow_simulation \
-        estimator_simulation \
-        kernel_simulation \
-        regularisation_simulation \
-        scatter_simulation \
         selection_simulation \
-        sketch \
-        validation_simulation \
+        #breslow_simulation \
+        #estimator_simulation \
+        #kernel_simulation \
+        #regularisation_simulation \
+        #scatter_simulation \
+        #sketch \
+        #validation_simulation \
 
 plot_score2:
     parallel --bar --lb uv run bin/plot/{1}.py {{DATE}} ::: \
