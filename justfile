@@ -1,5 +1,5 @@
 #REPS_SIM := "100"
-REPS_SIM := "100"
+REPS_SIM := "200"
 REPS_SCORE2 := "2"
 DATE := "2026-01-07"
 
@@ -19,7 +19,7 @@ illustration_simulation:
 
 analysis_simulation:
     seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 1
-    #seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 2
+    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 2
 
 illustration_score2:
     uv run bin/illustration_score2.py female
