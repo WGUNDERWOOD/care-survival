@@ -3,10 +3,100 @@ import itertools
 
 from care_survival import convex as care_convex
 from care_survival import kernel_estimator as care_kernel_estimator
+from care_survival import kernel_estimator_care2 as care_kernel_estimator_care2
 from care_survival import metrics as care_metrics
 
 class CARE2:
-    pass
+    def __init__(
+        self,
+        embedding,
+        gamma_min,
+        gamma_max,
+        n_gammas,
+        with_concordance=care_metrics.get_splits(),
+        verbose=False,
+    ):
+        self.embedding = embedding
+        self.gamma_min = gamma_min
+        self.gamma_max = gamma_max
+        self.n_gammas = n_gammas
+        self.gammas = get_gammas(gamma_min, gamma_max, n_gammas)
+        self.with_concordance = with_concordance
+        self.verbose = verbose
+
+    def fit(self):
+        beta_hat = None
+        theta_hat = None
+        inv_hessian_hat = None
+        self.kernel_estimators = []
+
+        for i in range(self.n_gammas):
+            # fit kernel estimator at gamma
+            gamma = self.gammas[i]
+            if self.verbose:
+                print(f"{i + 1} / {self.n_gammas}: gamma = {gamma}")
+            kernel_estimator = care_kernel_estimator_care2.KernelEstimatorCARE2(
+                self.embedding, gamma, self.with_concordance
+            )
+            kernel_estimator.fit(beta_hat, theta_hat, inv_hessian_hat)
+            inv_hessian_hat = kernel_estimator.inv_hessian_hat
+            beta_hat = kernel_estimator.beta_hat
+            theta_hat = kernel_estimator.theta_hat
+            self.kernel_estimators.append(kernel_estimator)
+
+        self.best = {}
+        for model in care_metrics.get_models():
+            self.best[model] = {}
+            for metric in care_metrics.get_metrics():
+                self.best[model][metric] = {}
+                for split in care_metrics.get_splits():
+                    self.best[model][metric][split] = self.best_by(model, metric, split)
+
+        self.summarise()
+
+    def best_by(self, model, metric, split):
+        #print(self.kernel_estimators)
+        cs = [c for c in self.kernel_estimators if c.score[metric][split] is not None]
+        #print(cs)
+
+        #if model == "kernel":
+            #cs = [c for c in cs if np.sum(c.theta) == 0]
+        #elif model == "external":
+            #cs = [c for c in cs if np.any(c.theta == 1)]
+
+        def key(c):
+            return c.score[metric][split]
+
+        return min(cs, key=key)
+
+    def summarise(self):
+        star = self.best["kernel"]["l2"]["test"]
+        hat = self.best["kernel"]["ln"]["valid"]
+        dagger = self.best["aggregated"]["l2"]["test"]
+        check = self.best["aggregated"]["ln"]["valid"]
+        tilde = self.best["external"]["ln"]["valid"]
+
+        self.summary = {
+            "n_train": self.embedding.data["train"].n,
+            "n_valid": self.embedding.data["valid"].n,
+            "n_test": self.embedding.data["test"].n,
+            "gamma_star": star.gamma,
+            "gamma_hat": hat.gamma,
+            "gamma_dagger": dagger.gamma,
+            "gamma_check": check.gamma,
+            "theta_dagger": dagger.theta_hat,
+            "theta_check": check.theta_hat,
+            "l2_star": star.score["l2"]["test"],
+            "l2_hat": hat.score["l2"]["test"],
+            "l2_dagger": dagger.score["l2"]["test"],
+            "l2_check": check.score["l2"]["test"],
+            "l2_tilde": tilde.score["l2"]["test"],
+            "concordance_star": star.score["concordance"]["test"],
+            "concordance_hat": hat.score["concordance"]["test"],
+            "concordance_dagger": dagger.score["concordance"]["test"],
+            "concordance_check": check.score["concordance"]["test"],
+            "concordance_tilde": tilde.score["concordance"]["test"],
+        }
 
 class CARE:
     def __init__(

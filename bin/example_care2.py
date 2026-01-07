@@ -50,14 +50,23 @@ embedding = care_survival.embed(
 )
 
 # fit CARE2
-gamma = 0.1
-kernel_estimator = care_survival.KernelEstimatorCARE2(
-    embedding, gamma, with_concordance
-    )
-kernel_estimator.fit(None, None)
+#gamma = 0.1
+#kernel_estimator = care_survival.KernelEstimatorCARE2(
+    #embedding, gamma, with_concordance
+    #)
+#kernel_estimator.fit(None, None, None)
+#print(kernel_estimator.score)
+
+
+
+care2 = care_survival.CARE2(embedding, gamma_min, gamma_max, n_gammas,
+                            verbose=False)
+care2.fit()
+
+#print(care2.beta_hat)
 
 ## view diagnostics
-#best = care.best["aggregated"]["ln"]["valid"]
-#print("best theta value:", best.theta)
-#print("best gamma value:", best.gamma)
-#print("concordance index:", best.score["concordance"]["valid"])
+best = care2.best["aggregated"]["ln"]["valid"]
+print("best theta value:", best.theta_hat)
+print("best gamma value:", best.gamma)
+print("concordance index:", best.score["concordance"]["valid"])

@@ -90,7 +90,7 @@ class KernelEstimatorCARE2:
 
         return dlng_beta, dlng_theta
 
-    def fit(self, init, inv_hessian_init):
+    def fit(self, beta_init, theta_init, inv_hessian_init):
 
         n = self.embedding.data["train"].n
         p = self.embedding.data["train"].f_tilde.shape[1]
@@ -108,10 +108,14 @@ class KernelEstimatorCARE2:
             dlng_theta = dlng[1]
             return np.concatenate((dlng_beta, dlng_theta))
 
-        if init is None:
+        if beta_init is None:
             beta_init = self.embedding.data["train"].get_default_beta()
+
+        if theta_init is None:
             theta_init = np.zeros(p)
-            init = np.concatenate((beta_init, theta_init))
+
+        init = np.concatenate((beta_init, theta_init))
+
         if inv_hessian_init is None:
             inv_hessian_beta_init = self.embedding.data["train"].get_default_inv_hessian()
             inv_hessian_theta_init = np.eye(p)
@@ -128,13 +132,32 @@ class KernelEstimatorCARE2:
 
         self.beta_hat = res.x[0:n]
         self.theta_hat = res.x[n:]
-        print(self.beta_hat)
-        print(self.theta_hat)
         self.inv_hessian_hat = (res.hess_inv + res.hess_inv.T) / 2
 
         self.f_hat = {}
         for split in care_metrics.get_splits():
             self.f_hat[split] = self.get_f(self.beta_hat, self.theta_hat, split)
+
+        self.get_score()
+
+    def get_score(self):
+        embedding = self.embedding
+        f = {}
+        for split in care_metrics.get_splits():
+            f[split] = self.f_hat[split]
+
+        score = {}
+        for metric in care_metrics.get_metrics():
+            score[metric] = {}
+            for split in care_metrics.get_splits():
+                score[metric][split] = care_metrics.get_metric_split(
+                    f[split],
+                    embedding,
+                    metric,
+                    split,
+                    self.with_concordance,
+                )
+        self.score = score
 
 
 def expt(f, f_max):
