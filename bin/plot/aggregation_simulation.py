@@ -85,10 +85,10 @@ def plot_aggregation(csv_path, plot_path, dgp):
         label="CARE2 method",
     )
 
-    if dgp == "1":
-        plt.ylim([0.06, 0.5])
-    if dgp == "2":
-        plt.ylim([0.33, 1.22])
+    #if dgp == "1":
+        #plt.ylim([0.06, 0.5])
+    #if dgp == "2":
+        #plt.ylim([0.33, 1.22])
 
     plt.xlabel("Sample size $n$")
     plt.ylabel("$L_2$-error")
@@ -101,5 +101,5 @@ for dgp in ["1", "2"]:
 #for dgp in ["1"]:
     date = sys.argv[1]
     csv_path = "data/" + date + "/simulation/analysis/"
-    plot_path = "plot/aggregation_dgp_" + dgp + ".pdf"
+    plot_path = "plot/aggregation_dgp_" + dgp + "_CARE2.pdf"
     plot_aggregation(csv_path, plot_path, dgp)

@@ -1,7 +1,7 @@
 #REPS_SIM := "100"
 REPS_SIM := "200"
 REPS_SCORE2 := "2"
-DATE := "2026-01-07"
+DATE := "2026-01-08"
 
 default: simulation plot_simulation
 

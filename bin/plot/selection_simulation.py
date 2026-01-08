@@ -83,5 +83,5 @@ for dgp in ["1", "2"]:
 #for dgp in ["1"]:
     date = sys.argv[1]
     csv_path = "data/" + date + "/simulation/analysis/"
-    plot_path = "plot/selection_dgp_" + dgp + ".pdf"
+    plot_path = "plot/selection_dgp_" + dgp + "_CARE2.pdf"
     plot_selection(csv_path, plot_path, dgp)
