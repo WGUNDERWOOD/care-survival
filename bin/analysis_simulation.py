@@ -23,12 +23,12 @@ def main():
         30,
         40,
         50,
-        60,
-        70,
-        80,
-        90,
-        100,
-        120,
+        #60,
+        #70,
+        #80,
+        #90,
+        #100,
+        #120,
         #150,
         ##200,
         ##250,
@@ -45,7 +45,6 @@ def main():
     distribution = care_distributions.get_distribution(dgp)
     a = 1
     kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
-    #n_gammas = 5
     n_gammas = 50
     gamma_min = 1e-5
     gamma_max = 1e1
@@ -54,7 +53,6 @@ def main():
     simplex_resolution = 0.1
     np.random.seed(rep)
     with_concordance = []
-    #verbose = True
     verbose = False
     cares = []
     care2s = []

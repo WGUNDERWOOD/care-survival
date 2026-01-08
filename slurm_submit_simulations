@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH -J simulation_care
+#SBATCH -A SAMWORTH-SL3-CPU
+#SBATCH -p icelake
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mail-type=ALL
+#SBATCH --time=00:01:00
+#SBATCH --array=1-2
+
+#! Set up modules and environment
+. /etc/profile.d/modules.sh
+module purge
+module load parallel
+export I_MPI_PIN_DOMAIN=omp:compact
+export I_MPI_PIN_ORDER=scatter
+cd $SLURM_SUBMIT_DIR
+echo "Started: $(date)"
+
+#! Run commands
+#! if [[ "$SLURM_ARRAY_TASK_ID" == 1 ]]; then
+    #! parallel --lb uv run ./bin/illustration_simulation.py {1} ::: 1 2
+#! fi
+
+echo "Array ID: $SLURM_ARRAY_TASK_ID"
+parallel --lb uv run ./bin/analysis_simulation.py {1} {2} ::: 1 2 ::: $SLURM_ARRAY_TASK_ID
+
+echo "Finished: $(date)"
