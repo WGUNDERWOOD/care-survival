@@ -15,6 +15,7 @@ class CARE:
         n_gammas,
         simplex_resolution,
         with_concordance=care_metrics.get_splits(),
+        with_brier=care_metrics.get_splits(),
         verbose=False,
     ):
         self.embedding = embedding
@@ -27,6 +28,7 @@ class CARE:
         self.thetas = get_simplex(self.simplex_dimension, simplex_resolution)
         self.n_thetas = len(self.thetas)
         self.with_concordance = with_concordance
+        self.with_brier = with_brier
         self.verbose = verbose
 
     def fit(self):
@@ -41,7 +43,7 @@ class CARE:
             if self.verbose:
                 print(f"{i + 1} / {self.n_gammas}: gamma = {gamma}")
             kernel_estimator = care_kernel_estimator.KernelEstimator(
-                self.embedding, gamma, self.with_concordance
+                self.embedding, gamma, self.with_concordance, self.with_brier
             )
             kernel_estimator.fit(beta_hat, inv_hessian_hat)
             inv_hessian_hat = kernel_estimator.inv_hessian_hat

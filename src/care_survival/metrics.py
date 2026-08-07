@@ -8,7 +8,7 @@ def get_splits():
 
 
 def get_metrics():
-    return ["ln", "l2", "concordance"]
+    return ["ln", "l2", "concordance", "brier"]
 
 
 def get_models():
@@ -62,8 +62,10 @@ def get_concordance_split(f, embedding, split):
 
 
 def get_adjusted_breslow(f, embedding, split):
+    # TODO need to be able to evaluate at arbitrary t values
     embedding_data = embedding.data[split]
     N = embedding_data.N
+    Z = embedding_data.Z
     n = embedding_data.n
     if n > 0:
         f_max = np.max(f)
@@ -73,11 +75,34 @@ def get_adjusted_breslow(f, embedding, split):
     sn = care_kernel_estimator.get_sn(embedding_data, f_expt)
     N_over_sn = N / sn
     cumulative_sum = np.cumsum(N_over_sn)
+    p = cumulative_sum[Z.astype(int)]
+    return np.exp(-p)
+
+
+def get_censoring_breslow(f, embedding, split):
+    embedding_data = embedding.data[split]
+    I = embedding_data.I
+    R_bar = embedding_data.R_bar
+    Z = embedding_data.Z
+    I_over_R = I / (R_bar * n)
+    cumulative_sum = np.cumsum(I_over_R)
     p = cumulative_sum[self.Z.astype(int)]
     return np.exp(-p)
 
 
-def get_metric_split(f, embedding, metric, split, with_concordance):
+def get_survival_probability(f, embedding, split):
+    adjusted_breslow = get_adjusted_breslow(f, embedding, split)
+    return adjusted_breslow ** np.exp(f)
+
+
+def get_brier_split(f, embedding, split):
+    survival_probability = get_survival_probability(f, embedding, "train")
+    censoring_breslow = get_censoring_breslow(f, embedding, split)
+    return 0.0
+    # TODO
+
+
+def get_metric_split(f, embedding, metric, split, with_concordance, with_brier):
     if metric == "ln":
         score = get_ln_split(f, embedding, split)
     elif metric == "l2":
@@ -85,6 +110,11 @@ def get_metric_split(f, embedding, metric, split, with_concordance):
     elif metric == "concordance":
         if split in with_concordance:
             score = get_concordance_split(f, embedding, split)
+        else:
+            return np.inf
+    elif metric == "brier":
+        if split in with_brier:
+            score = get_brier_split(f, embedding, split)
         else:
             return np.inf
     return float(score)

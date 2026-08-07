@@ -5,11 +5,12 @@ from care_survival import metrics as care_metrics
 
 
 class KernelEstimator:
-    def __init__(self, embedding, gamma, with_concordance):
+    def __init__(self, embedding, gamma, with_concordance, with_brier):
         self.embedding = embedding
         self.gamma = gamma
         self.method = embedding.data["train"].method
         self.with_concordance = with_concordance
+        self.with_brier = with_brier
 
         if self.method == "feature_map":
             self.feature_dim = embedding.data["train"].feature_dim

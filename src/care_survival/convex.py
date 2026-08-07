@@ -40,5 +40,6 @@ class ConvexEstimator:
                     metric,
                     split,
                     self.kernel_estimator.with_concordance,
+                    self.kernel_estimator.with_brier,
                 )
         return score
