@@ -61,6 +61,22 @@ def get_concordance_split(f, embedding, split):
         return 0
 
 
+def get_adjusted_breslow(f, embedding, split):
+    embedding_data = embedding.data[split]
+    N = embedding_data.N
+    n = embedding_data.n
+    if n > 0:
+        f_max = np.max(f)
+    else:
+        f_max = 0
+    f_expt = care_kernel_estimator.expt(f, f_max)
+    sn = care_kernel_estimator.get_sn(embedding_data, f_expt)
+    N_over_sn = N / sn
+    cumulative_sum = np.cumsum(N_over_sn)
+    p = cumulative_sum[self.Z.astype(int)]
+    return np.exp(-p)
+
+
 def get_metric_split(f, embedding, metric, split, with_concordance):
     if metric == "ln":
         score = get_ln_split(f, embedding, split)
