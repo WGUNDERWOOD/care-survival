@@ -1,6 +1,6 @@
-REPS_SIM := "50"
+REPS_SIM := "3"
 REPS_SCORE2 := "2"
-DATE := "2025-06-30"
+DATE := "2026-08-07"
 
 default: simulation plot_simulation
 
@@ -17,8 +17,8 @@ illustration_simulation:
     uv run bin/illustration_simulation.py 2
 
 analysis_simulation:
-    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 1
-    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 2
+    seq 1 {{REPS_SIM}} | parallel -j 1 --bar --lb uv run bin/analysis_simulation.py 1
+    seq 1 {{REPS_SIM}} | parallel -j 1 --bar --lb uv run bin/analysis_simulation.py 2
 
 illustration_score2:
     uv run bin/illustration_score2.py female

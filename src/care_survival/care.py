@@ -22,7 +22,7 @@ def care(
     simplex_resolution,
     with_concordance,
     with_brier,
-    brier_ts,
+    n_brier_ts,
     verbose=False,
 ):
     # get parameters from shape of data
@@ -37,6 +37,9 @@ def care(
     T_range = T_max - T_min
     T_train = (T_train - T_min) / T_range
     T_valid = (T_valid - T_min) / T_range
+
+    # get Brier score t values
+    brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
     # construct empty test data
     X_test = np.empty((0, d))
