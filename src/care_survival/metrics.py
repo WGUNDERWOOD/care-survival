@@ -61,48 +61,58 @@ def get_concordance_split(f, embedding, split):
         return 0
 
 
-def get_adjusted_breslow(f, embedding, split):
-    # TODO need to be able to evaluate at arbitrary t values
+def get_adjusted_breslow(f, embedding, split, brier_ts):
     embedding_data = embedding.data[split]
-    N = embedding_data.N
-    Z = embedding_data.Z
     n = embedding_data.n
-    if n > 0:
-        f_max = np.max(f)
-    else:
-        f_max = 0
-    f_expt = care_kernel_estimator.expt(f, f_max)
-    sn = care_kernel_estimator.get_sn(embedding_data, f_expt)
-    N_over_sn = N / sn
-    cumulative_sum = np.cumsum(N_over_sn)
-    p = cumulative_sum[Z.astype(int)]
+    T = embedding_data.T
+    N = embedding_data.N
+    sn = care_kernel_estimator.get_sn(embedding_data, np.exp(f))
+    T_leq_t = T[:, None] <= brier_ts[None, :]
+    N_over_sn = T_leq_t * N[:, None] / (sn[:, None] * n)
+    p = np.sum(N_over_sn, axis=0)
     return np.exp(-p)
 
 
-def get_censoring_breslow(f, embedding, split):
+def get_survival_probability(f, embedding, split, brier_ts):
+    adjusted_breslow = get_adjusted_breslow(f, embedding, split, brier_ts)
+    return adjusted_breslow[None, :] ** np.exp(f[:, None])
+
+
+def get_censoring_breslow(f, embedding, split, brier_ts):
     embedding_data = embedding.data[split]
+    n = embedding_data.n
+    T = embedding_data.T
     I = embedding_data.I
     R_bar = embedding_data.R_bar
-    Z = embedding_data.Z
-    I_over_R = I / (R_bar * n)
-    cumulative_sum = np.cumsum(I_over_R)
-    p = cumulative_sum[self.Z.astype(int)]
+    T_leq_t = T[:, None] <= brier_ts[None, :]
+    NC_over_R = T_leq_t * I[:, None] / (R_bar[:, None] * n)
+    p = np.sum(NC_over_R, axis=0)
     return np.exp(-p)
 
 
-def get_survival_probability(f, embedding, split):
-    adjusted_breslow = get_adjusted_breslow(f, embedding, split)
-    return adjusted_breslow ** np.exp(f)
+def get_pointwise_brier(f, embedding, split, brier_ts):
+    embedding_data = embedding.data[split]
+    n = embedding_data.n
+    T = embedding_data.T
+    N = embedding_data.N
+    I = embedding_data.I
+    survival_probability = get_survival_probability(f, embedding, "train", brier_ts)
+    censoring_breslow_1 = get_censoring_breslow(f, embedding, split, T)
+    censoring_breslow_2 = get_censoring_breslow(f, embedding, split, brier_ts)
+    T_leq_t = T[:, None] <= brier_ts[None, :]
+    numer1 = survival_probability**2 * T_leq_t * N[:, None]
+    term1 = np.sum(numer1 / censoring_breslow_1[:, None], axis=0) / n
+    numer2 = (1 - survival_probability)**2 * (1 - T_leq_t)
+    term2 = np.sum(numer2 / censoring_breslow_2[None, :], axis=0) / n
+    return term1 + term2
+
+def get_brier_split(f, embedding, split, brier_ts):
+    pointwise_brier = get_pointwise_brier(f, embedding, split, brier_ts)
+    brier = np.sum(pointwise_brier) / len(brier_ts)
+    return brier
 
 
-def get_brier_split(f, embedding, split):
-    survival_probability = get_survival_probability(f, embedding, "train")
-    censoring_breslow = get_censoring_breslow(f, embedding, split)
-    return 0.0
-    # TODO
-
-
-def get_metric_split(f, embedding, metric, split, with_concordance, with_brier):
+def get_metric_split(f, embedding, metric, split, with_concordance, with_brier, brier_ts):
     if metric == "ln":
         score = get_ln_split(f, embedding, split)
     elif metric == "l2":
@@ -114,7 +124,7 @@ def get_metric_split(f, embedding, metric, split, with_concordance, with_brier):
             return np.inf
     elif metric == "brier":
         if split in with_brier:
-            score = get_brier_split(f, embedding, split)
+            score = get_brier_split(f, embedding, split, brier_ts)
         else:
             return np.inf
     return float(score)

@@ -21,6 +21,8 @@ def care(
     gamma_max,
     simplex_resolution,
     with_concordance,
+    with_brier,
+    brier_ts,
     verbose=False,
 ):
     # get parameters from shape of data
@@ -65,6 +67,8 @@ def care(
         n_gammas,
         simplex_resolution,
         with_concordance,
+        with_brier,
+        brier_ts,
         verbose,
     )
     care.fit()

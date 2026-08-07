@@ -12,6 +12,7 @@ class ConvexEstimator:
         self.f_check = {}
         for split in care_metrics.get_splits():
             self.f_check[split] = self.get_f_check_split(split)
+        self.brier_ts = kernel_estimator.brier_ts
         self.score = self.get_score()
 
     def get_f_check_split(self, split):
@@ -41,5 +42,6 @@ class ConvexEstimator:
                     split,
                     self.kernel_estimator.with_concordance,
                     self.kernel_estimator.with_brier,
+                    self.brier_ts
                 )
         return score
