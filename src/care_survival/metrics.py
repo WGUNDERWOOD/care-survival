@@ -107,6 +107,7 @@ def get_pointwise_brier(f, embedding, split, brier_ts):
     return term1 + term2
 
 def get_brier_split(f, embedding, split, brier_ts):
+    # TODO slow
     pointwise_brier = get_pointwise_brier(f, embedding, split, brier_ts)
     brier = np.sum(pointwise_brier) / len(brier_ts)
     return brier
@@ -124,7 +125,9 @@ def get_metric_split(f, embedding, metric, split, with_concordance, with_brier, 
             return np.inf
     elif metric == "brier":
         if split in with_brier:
+            #print("get brier score")
             score = get_brier_split(f, embedding, split, brier_ts)
+            #print("done")
         else:
             return np.inf
     return float(score)

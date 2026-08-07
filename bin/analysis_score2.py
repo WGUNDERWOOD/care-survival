@@ -30,13 +30,13 @@ def main():
     else:
         ns = [
             3000,
-            4000,
-            5000,
-            6000,
-            7000,
-            8000,
-            9000,
-            10000,
+            #4000,
+            #5000,
+            #6000,
+            #7000,
+            #8000,
+            #9000,
+            #10000,
             #12000,
             #14000,
             #16000,
@@ -48,10 +48,12 @@ def main():
         ]
         if sex == "female":
             #ns.append([40000, 45000, 50000, n_female_over_3])
-            n_test = n_female_over_3
+            #n_test = n_female_over_3
+            n_test = max(ns)
         elif sex == "male":
             #ns.append([n_male_over_3])
-            n_test = n_male_over_3
+            #n_test = n_male_over_3
+            n_test = max(ns)
 
     # more set-up
     n_gammas = 50
@@ -63,11 +65,12 @@ def main():
     p = 2
     kernel = care_kernels.PolynomialKernel(a, p)
     with_concordance = ["test"]
-    with_brier = ["test"]
-    n_brier_ts = 500
+    #with_brier = ["test"]
+    with_brier = []
+    n_brier_ts = 50
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
-    verbose = False
+    verbose = True
     ns.sort(reverse=True)
     cares = []
 
