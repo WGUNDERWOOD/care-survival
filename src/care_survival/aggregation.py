@@ -109,6 +109,11 @@ class CARE:
             "concordance_dagger": dagger.score["concordance"]["test"],
             "concordance_check": check.score["concordance"]["test"],
             "concordance_tilde": tilde.score["concordance"]["test"],
+            "brier_star": star.score["brier"]["test"],
+            "brier_hat": hat.score["brier"]["test"],
+            "brier_dagger": dagger.score["brier"]["test"],
+            "brier_check": check.score["brier"]["test"],
+            "brier_tilde": tilde.score["brier"]["test"],
         }
 
 

@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 import pandas as pd
 from datetime import datetime
 
@@ -62,6 +63,10 @@ def main():
     p = 2
     kernel = care_kernels.PolynomialKernel(a, p)
     with_concordance = ["test"]
+    with_brier = ["test"]
+    n_brier_ts = 20
+    brier_ts = np.linspace(0, 1, num=n_brier_ts)
+
     verbose = False
     ns.sort(reverse=True)
     cares = []
@@ -86,6 +91,8 @@ def main():
             n_gammas,
             simplex_resolution,
             with_concordance,
+            with_brier,
+            brier_ts,
             verbose,
         )
         care.fit()
@@ -138,6 +145,8 @@ def write_summary(cares, rep, model, sex, path):
             "l2_tilde",
             "concordance_star",
             "concordance_dagger",
+            "brier_star",
+            "brier_dagger",
         ],
         axis=1,
     )

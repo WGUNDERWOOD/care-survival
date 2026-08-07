@@ -8,7 +8,7 @@ import sys
 import common
 
 
-def plot_aggregation_score2(csv_path, plot_path, sex):
+def plot_brier_score2(csv_path, plot_path, sex):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "model_" + model + "_" + sex in f]
     df_all = pd.concat(pd.read_csv(f) for f in csv_files)
@@ -16,20 +16,20 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     df = df_all.groupby("n").mean()
     n_rep = df_all["rep"].nunique()
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
-    ct_all = df["concordance_tilde"][df.index == max(df.index)]
-    cc_all = df["concordance_check"][df.index == max(df.index)]
+    ct_all = df["brier_tilde"][df.index == max(df.index)]
+    cc_all = df["brier_check"][df.index == max(df.index)]
     #print(100 * ((cc_all - ct_all) / ct_all).values[0])
-    cols = ["concordance_check", "concordance_hat", "concordance_tilde"]
+    cols = ["brier_check", "brier_hat", "brier_tilde"]
 
     for c in cols:
         df[c + "_std"] = df_sd[c]
     df = df.sort_values(by="n")
-    df["concordance_tilde"] = np.mean(df["concordance_tilde"])
+    df["brier_tilde"] = np.mean(df["brier_tilde"])
     (fig, ax) = plt.subplots(figsize=(4, 3))
 
     # plot error bands
     for c in cols:
-        if c != "concordance_tilde":
+        if c != "brier_tilde":
             plt.fill_between(
                 df.index,
                 df[c] - 2 * df[c + "_std"],
@@ -40,14 +40,14 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     # plot averages
     plt.plot(
         df.index,
-        df["concordance_check"],
+        df["brier_check"],
         c="k",
         lw=1,
         label="CARE method $\\check f_{n,\\check\\gamma,\\check\\theta}$",
     )
     plt.plot(
         df.index,
-        df["concordance_hat"],
+        df["brier_hat"],
         c="k",
         lw=1,
         ls="-.",
@@ -55,7 +55,7 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     )
     plt.plot(
         df.index,
-        df["concordance_tilde"],
+        df["brier_tilde"],
         c="k",
         lw=1,
         ls=":",
@@ -75,7 +75,7 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
         plt.yticks([0.685, 0.690, 0.695, 0.700])
 
     plt.xlabel("Training/validation sample size $n$")
-    plt.ylabel("Concordance index")
+    plt.ylabel("Integrated Brier score")
     ax.xaxis.set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
@@ -85,5 +85,5 @@ for model in ["1", "2"]:
     for sex in ["female", "male"]:
         date = sys.argv[1]
         csv_path = "data/" + date + "/score2/analysis/"
-        plot_path = "plot/aggregation_score2_model_" + model + "_" + sex + ".pdf"
-        plot_aggregation_score2(csv_path, plot_path, sex)
+        plot_path = "plot/brier_score2_model_" + model + "_" + sex + ".pdf"
+        plot_brier_score2(csv_path, plot_path, sex)

@@ -17,8 +17,8 @@ illustration_simulation:
     uv run bin/illustration_simulation.py 2
 
 analysis_simulation:
-    seq 1 {{REPS_SIM}} | parallel -j 1 --bar --lb uv run bin/analysis_simulation.py 1
-    seq 1 {{REPS_SIM}} | parallel -j 1 --bar --lb uv run bin/analysis_simulation.py 2
+    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 1
+    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 2
 
 illustration_score2:
     uv run bin/illustration_score2.py female
@@ -45,5 +45,6 @@ plot_simulation:
 plot_score2:
     parallel --bar --lb uv run bin/plot/{1}.py {{DATE}} ::: \
         aggregation_score2 \
+        brier_score2 \
         breslow_score2 \
         selection_score2 \
