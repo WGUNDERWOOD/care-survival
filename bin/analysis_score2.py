@@ -37,20 +37,20 @@ def main():
             8000,
             9000,
             10000,
-            12000,
-            14000,
-            16000,
-            18000,
-            20000,
-            25000,
-            30000,
-            35000,
+            #12000,
+            #14000,
+            #16000,
+            #18000,
+            #20000,
+            #25000,
+            #30000,
+            #35000,
         ]
         if sex == "female":
-            ns.append([40000, 45000, 50000, n_female_over_3])
+            #ns.append([40000, 45000, 50000, n_female_over_3])
             n_test = n_female_over_3
         elif sex == "male":
-            ns.append([n_male_over_3])
+            #ns.append([n_male_over_3])
             n_test = n_male_over_3
 
     # more set-up
@@ -64,7 +64,7 @@ def main():
     kernel = care_kernels.PolynomialKernel(a, p)
     with_concordance = ["test"]
     with_brier = ["test"]
-    n_brier_ts = 20
+    n_brier_ts = 500
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
     verbose = False
