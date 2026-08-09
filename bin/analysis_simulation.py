@@ -23,11 +23,11 @@ def main():
         30,
         40,
         50,
-        #60,
-        #70,
-        #80,
-        #90,
-        #100,
+        60,
+        70,
+        80,
+        90,
+        100,
         #120,
         #150,
         #200,
@@ -39,12 +39,12 @@ def main():
         #500,
     ]
     #n_test = 500
-    n_test = 100
+    n_test = 200
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
     kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
-    n_gammas = 5
+    n_gammas = 50
     gamma_min = 1e-5
     gamma_max = 1e1
     ns.sort(reverse=True)
@@ -52,10 +52,10 @@ def main():
     simplex_resolution = 0.05
     np.random.seed(rep)
     with_metrics = {
-            "ln": ["test"],
+            "ln": ["valid", "test"],
             "l2": ["test"],
-            "concordance": ["test"],
-            "brier": ["test"],
+            #"concordance": ["test"],
+            #"brier": ["test"],
     }
     n_brier_ts = 100
     brier_ts = np.linspace(0, 1, num=n_brier_ts)

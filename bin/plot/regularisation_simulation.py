@@ -51,10 +51,10 @@ def plot_regularisation(csv_path, plot_path, dgp):
             fc=common.std_col(),
         )
 
-    if dgp == "1":
-        plt.ylim([9.2e-4, 1.1e-2])
-    elif dgp == "2":
-        plt.ylim([9.2e-4, 3.3e-2])
+    #if dgp == "1":
+        #plt.ylim([9.2e-4, 1.1e-2])
+    #elif dgp == "2":
+        #plt.ylim([9.2e-4, 3.3e-2])
 
     ax.set_yscale("log")
     plt.xlabel("Sample size $n$")
