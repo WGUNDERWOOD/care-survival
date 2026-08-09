@@ -91,6 +91,7 @@ def get_censoring_breslow(f, embedding, split, brier_ts):
 
 
 def get_pointwise_brier(f, embedding, split, brier_ts):
+    # TODO slow
     embedding_data = embedding.data[split]
     n = embedding_data.n
     T = embedding_data.T
@@ -107,27 +108,23 @@ def get_pointwise_brier(f, embedding, split, brier_ts):
     return term1 + term2
 
 def get_brier_split(f, embedding, split, brier_ts):
-    # TODO slow
     pointwise_brier = get_pointwise_brier(f, embedding, split, brier_ts)
     brier = np.sum(pointwise_brier) / len(brier_ts)
     return brier
 
 
-def get_metric_split(f, embedding, metric, split, with_concordance, with_brier, brier_ts):
-    if metric == "ln":
-        score = get_ln_split(f, embedding, split)
-    elif metric == "l2":
-        score = get_l2_split(f, embedding, split)
-    elif metric == "concordance":
-        if split in with_concordance:
-            score = get_concordance_split(f, embedding, split)
-        else:
-            return np.inf
-    elif metric == "brier":
-        if split in with_brier:
-            #print("get brier score")
-            score = get_brier_split(f, embedding, split, brier_ts)
-            #print("done")
-        else:
-            return np.inf
-    return float(score)
+def get_metric_split(f, embedding, metric, split, with_metrics, brier_ts):
+    if metric in with_metrics.keys():
+        if split in with_metrics[metric]:
+            if metric == "ln":
+                score = get_ln_split(f, embedding, split)
+            elif metric == "l2":
+                score = get_l2_split(f, embedding, split)
+            elif metric == "concordance":
+                score = get_concordance_split(f, embedding, split)
+            elif metric == "brier":
+                score = get_brier_split(f, embedding, split, brier_ts)
+            return float(score)
+
+    return np.inf
+

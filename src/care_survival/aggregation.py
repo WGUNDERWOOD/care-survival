@@ -14,8 +14,7 @@ class CARE:
         gamma_max,
         n_gammas,
         simplex_resolution,
-        with_concordance,
-        with_brier,
+        with_metrics,
         brier_ts,
         verbose=False,
     ):
@@ -28,8 +27,7 @@ class CARE:
         self.simplex_dimension = np.shape(embedding.data["train"].f_tilde)[1]
         self.thetas = get_simplex(self.simplex_dimension, simplex_resolution)
         self.n_thetas = len(self.thetas)
-        self.with_concordance = with_concordance
-        self.with_brier = with_brier
+        self.with_metrics = with_metrics
         self.brier_ts = brier_ts
         self.verbose = verbose
 
@@ -45,7 +43,7 @@ class CARE:
             if self.verbose:
                 print(f"{i + 1} / {self.n_gammas}: gamma = {gamma}")
             kernel_estimator = care_kernel_estimator.KernelEstimator(
-                self.embedding, gamma, self.with_concordance, self.with_brier, self.brier_ts
+                self.embedding, gamma, self.with_metrics, self.brier_ts
             )
             kernel_estimator.fit(beta_hat, inv_hessian_hat)
             inv_hessian_hat = kernel_estimator.inv_hessian_hat

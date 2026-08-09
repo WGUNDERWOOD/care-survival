@@ -65,9 +65,10 @@ def main():
     a = 1
     p = 2
     kernel = care_kernels.PolynomialKernel(a, p)
-    with_concordance = ["test"]
-    #with_brier = ["test"]
-    with_brier = []
+    with_metrics = {
+        "concordance": ["valid"],
+        "brier": ["valid"],
+    }
     n_brier_ts = 50
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
@@ -94,8 +95,7 @@ def main():
             gamma_max,
             n_gammas,
             simplex_resolution,
-            with_concordance,
-            with_brier,
+            with_metrics,
             brier_ts,
             verbose,
         )

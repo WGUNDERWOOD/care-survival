@@ -40,8 +40,7 @@ class ConvexEstimator:
                     embedding,
                     metric,
                     split,
-                    self.kernel_estimator.with_concordance,
-                    self.kernel_estimator.with_brier,
+                    self.kernel_estimator.with_metrics,
                     self.brier_ts
                 )
         return score

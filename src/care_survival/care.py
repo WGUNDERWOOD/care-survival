@@ -20,8 +20,7 @@ def care(
     gamma_min,
     gamma_max,
     simplex_resolution,
-    with_concordance,
-    with_brier,
+    with_metrics,
     n_brier_ts,
     verbose=False,
 ):
@@ -69,8 +68,7 @@ def care(
         gamma_max,
         n_gammas,
         simplex_resolution,
-        with_concordance,
-        with_brier,
+        with_metrics,
         brier_ts,
         verbose,
     )

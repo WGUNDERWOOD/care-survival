@@ -35,7 +35,7 @@ def main():
     gamma_min = 1e-5
     gamma_max = 1e1
     simplex_resolution = 1
-    with_concordance = []
+    with_metrics = {}
     verbose = True
     care = care_aggregation.CARE(
         embedding,
@@ -43,7 +43,7 @@ def main():
         gamma_max,
         n_gammas,
         simplex_resolution,
-        with_concordance,
+        with_metrics,
         verbose,
     )
     care.fit()

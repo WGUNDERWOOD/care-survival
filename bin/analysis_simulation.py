@@ -51,9 +51,14 @@ def main():
     method = "kernel"
     simplex_resolution = 0.05
     np.random.seed(rep)
-    with_concordance = []
-    with_brier = []
-    brier_ts = []
+    with_metrics = {
+            "ln": ["train", "valid", "test"],
+            "l2": ["train", "valid", "test"],
+            "concordance": ["train", "valid", "test"],
+            "brier": ["train", "valid", "test"]
+            }
+    n_brier_ts = 100
+    brier_ts = np.linspace(0, 1, num=n_brier_ts)
     verbose = False
     cares = []
 
@@ -75,8 +80,7 @@ def main():
             gamma_max,
             n_gammas,
             simplex_resolution,
-            with_concordance,
-            with_brier,
+            with_metrics,
             brier_ts,
             verbose,
         )

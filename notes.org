@@ -1,6 +1,4 @@
 #+title: care-survival
 * Tasks
-** l2 metric
-*** Calculation is slow and unnecessary on SCORE2 data
-*** Add a new option: with_metrics = {"l2" = ["train", test], ...}
+** TODO Use proper code wrapper in scripts
 

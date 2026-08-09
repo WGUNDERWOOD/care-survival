@@ -52,5 +52,5 @@ plot_score2:
         selection_score2 \
 
 profile:
-    #uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1
-    uv run py-spy record -o profile.svg -- python bin/analysis_score2.py 1 female 1
+    uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1
+    #uv run py-spy record -o profile.svg -- python bin/analysis_score2.py 1 female 1

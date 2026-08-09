@@ -35,8 +35,12 @@ gamma_max = 1e1
 simplex_resolution = 0.05
 
 # compute concordance and integrated brier score on all data
-with_concordance = ["train", "valid"]
-with_brier = ["train", "valid"]
+with_metrics = {
+    "ln": ["train", "valid"],
+    "l2": ["train", "valid"],
+    "concordance": ["train", "valid"],
+    "brier": ["train", "valid"],
+}
 n_brier_ts = 20
 
 # fit CARE
@@ -55,8 +59,7 @@ care = care_survival.care(
     gamma_min,
     gamma_max,
     simplex_resolution,
-    with_concordance,
-    with_brier,
+    with_metrics,
     n_brier_ts,
 )
 
