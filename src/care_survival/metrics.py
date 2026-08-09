@@ -62,7 +62,6 @@ def get_concordance_split(f, embedding, split):
 
 
 def get_adjusted_breslow(f, embedding, split, brier_ts):
-    # TODO check this function
     embedding_data = embedding.data[split]
     n = embedding_data.n
     T = embedding_data.T
@@ -80,7 +79,6 @@ def get_survival_probability(f, embedding, split, brier_ts):
 
 
 def get_censoring_breslow_ts(f, embedding, split, brier_ts):
-    # TODO check this function
     embedding_data = embedding.data[split]
     n = embedding_data.n
     T = embedding_data.T
@@ -92,34 +90,27 @@ def get_censoring_breslow_ts(f, embedding, split, brier_ts):
     return np.exp(-p)
 
 
-def get_censoring_breslow_T(f, embedding, split, brier_ts):
-    # TODO write this function
+def get_censoring_breslow_T(f, embedding, split):
     embedding_data = embedding.data[split]
-    n = embedding_data.n
-    I = embedding_data.I
+    I = embedding_data.T
+    Z = embedding_data.Z
     R_bar = embedding_data.R_bar
-    NC_over_R = I / (R_bar * n)
-    #T = embedding_data.T
-    #T_leq_t = T[:, None] <= brier_ts[None, :]
-    #NC_over_R = T_leq_t * I[:, None] / (R_bar[:, None] * n)
-    #p = np.sum(NC_over_R, axis=0)
-    #return np.exp(-p)
+    n = embedding_data.n
+    I_over_R = I / (R_bar * n)
+    cumulative_sum = np.cumsum(I_over_R)
+    p = cumulative_sum[Z.astype(int)]
+    return np.exp(-p)
 
 
 def get_pointwise_brier(f, embedding, split, brier_ts):
-    # TODO slow
     embedding_data = embedding.data[split]
     n = embedding_data.n
     T = embedding_data.T
     N = embedding_data.N
     I = embedding_data.I
     survival_probability = get_survival_probability(f, embedding, "train", brier_ts)
-    # TODO remove
-    censoring_breslow_T_old = get_censoring_breslow_ts(f, embedding, split, T)
     censoring_breslow_T = get_censoring_breslow_T(f, embedding, split)
     censoring_breslow_ts = get_censoring_breslow_ts(f, embedding, split, brier_ts)
-    print(censoring_breslow_T)
-    print(embedding_data.breslow)
     T_leq_t = T[:, None] <= brier_ts[None, :]
     numer1 = survival_probability**2 * T_leq_t * N[:, None]
     term1 = np.sum(numer1 / censoring_breslow_T[:, None], axis=0) / n

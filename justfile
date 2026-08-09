@@ -1,5 +1,5 @@
 #REPS_SIM := "200"
-REPS_SIM := "3"
+REPS_SIM := "5"
 #REPS_SCORE2 := "20"
 REPS_SCORE2 := "2"
 DATE := "2026-08-09"
@@ -54,3 +54,6 @@ plot_score2:
 profile:
     #uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1
     #uv run py-spy record -o profile.svg -- python bin/analysis_score2.py 1 female 1
+
+test:
+    uv run pytest

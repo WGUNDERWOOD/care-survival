@@ -29,4 +29,5 @@ ignore = ["E741"]
 [dependency-groups]
 dev = [
     "py-spy>=0.4.2",
+    "pytest>=9.1.1",
 ]

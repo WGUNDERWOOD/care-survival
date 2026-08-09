@@ -1,5 +1,16 @@
 import numpy as np
 
+def get_R(T):
+    # Ri = min{j: Rj(Ti) = 1} = min{j: Tj >= Ti}
+    return np.searchsorted(T, T, side="left")
+
+def get_Z(T):
+    # Zi = max{j: Ri(Tj) = 1} = max{j: Ti >= Tj}
+    return np.searchsorted(T, T, side="right") - 1
+
+def get_R_bar(T):
+    # R_bar_i = sum_j Rj(Ti) / n = sum_j 1{Tj >= Ti} / n
+    return 1 - np.searchsorted(T, T, side="left") / len(T)
 
 class EmbeddingData:
     def __init__(self, data, kernel, method):
@@ -14,24 +25,9 @@ class EmbeddingData:
         self.method = method
         self.N = 1 - self.I
 
-        # R
-        self.R = np.zeros(self.n)
-        R_prev = 0
-        for j in range(self.n):
-            R_prev += np.argmax(self.T[R_prev : (j + 1)] >= self.T[j])
-            self.R[j] = R_prev
-
-        # Z
-        self.Z = np.zeros(self.n)
-        Z_prev = data.n - 1
-        for i in reversed(range(data.n)):
-            if i == 0:
-                Z_prev -= np.argmax(self.T[Z_prev::-1] <= self.T[i])
-            else:
-                Z_prev -= np.argmax(self.T[Z_prev : i - 1 : -1] <= self.T[i])
-            self.Z[i] = Z_prev
-
-        self.R_bar = (self.n - self.R) / self.n
+        self.R = get_R(self.T)
+        self.Z = get_Z(self.T)
+        self.R_bar = get_R_bar(self.T)
         self.ln_cent = np.sum(np.log(self.R_bar) * self.N) / max(self.n, 1)
 
         if method == "kernel":
