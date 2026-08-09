@@ -21,8 +21,8 @@ def main():
     _n_male = 121333
     n_female_over_3 = 54227
     n_male_over_3 = 40444
-    dry_run = False
-    #dry_run = True
+    #dry_run = False
+    dry_run = True
 
     # set up parameters
     if dry_run:
@@ -72,7 +72,8 @@ def main():
     n_brier_ts = 50
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
-    verbose = True
+    #verbose = True
+    verbose = False
     ns.sort(reverse=True)
     cares = []
 

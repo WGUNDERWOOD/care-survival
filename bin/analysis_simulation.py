@@ -54,8 +54,6 @@ def main():
     with_metrics = {
             "ln": ["train", "valid", "test"],
             "l2": ["train", "valid", "test"],
-            "concordance": ["train", "valid", "test"],
-            "brier": ["train", "valid", "test"]
             }
     n_brier_ts = 100
     brier_ts = np.linspace(0, 1, num=n_brier_ts)

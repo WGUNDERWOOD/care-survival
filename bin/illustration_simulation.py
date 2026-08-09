@@ -35,7 +35,10 @@ def main():
     gamma_min = 1e-5
     gamma_max = 1e1
     simplex_resolution = 1
-    with_metrics = {}
+    with_metrics = {
+            "ln": ["train", "valid"],
+            "l2": ["test"],
+            }
     verbose = True
     care = care_aggregation.CARE(
         embedding,
