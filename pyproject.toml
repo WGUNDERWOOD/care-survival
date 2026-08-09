@@ -25,3 +25,8 @@ publish-url = "https://test.pypi.org/legacy/"
 
 [tool.ruff.lint]
 ignore = ["E741"]
+
+[dependency-groups]
+dev = [
+    "py-spy>=0.4.2",
+]

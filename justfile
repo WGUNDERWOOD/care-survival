@@ -2,7 +2,7 @@
 REPS_SIM := "3"
 #REPS_SCORE2 := "20"
 REPS_SCORE2 := "2"
-DATE := "2026-08-07"
+DATE := "2026-08-09"
 
 default: simulation plot_simulation
 
@@ -50,3 +50,6 @@ plot_score2:
         brier_score2 \
         breslow_score2 \
         selection_score2 \
+
+profile:
+    uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1

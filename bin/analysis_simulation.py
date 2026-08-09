@@ -52,6 +52,8 @@ def main():
     simplex_resolution = 0.05
     np.random.seed(rep)
     with_concordance = []
+    with_brier = []
+    brier_ts = []
     verbose = False
     cares = []
 
@@ -74,6 +76,8 @@ def main():
             n_gammas,
             simplex_resolution,
             with_concordance,
+            with_brier,
+            brier_ts,
             verbose,
         )
         care.fit()
