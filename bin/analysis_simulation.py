@@ -23,11 +23,11 @@ def main():
         30,
         40,
         50,
-        60,
-        70,
-        80,
-        90,
-        100,
+        #60,
+        #70,
+        #80,
+        #90,
+        #100,
         #120,
         #150,
         #200,
@@ -52,9 +52,11 @@ def main():
     simplex_resolution = 0.05
     np.random.seed(rep)
     with_metrics = {
-            "ln": ["train", "valid", "test"],
-            "l2": ["train", "valid", "test"],
-            }
+            "ln": ["test"],
+            "l2": ["test"],
+            "concordance": ["test"],
+            "brier": ["test"],
+    }
     n_brier_ts = 100
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
     verbose = False

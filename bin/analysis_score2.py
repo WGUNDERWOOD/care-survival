@@ -67,8 +67,8 @@ def main():
     p = 2
     kernel = care_kernels.PolynomialKernel(a, p)
     with_metrics = {
-        "concordance": ["valid"],
-        "brier": ["valid"],
+        "concordance": ["test"],
+        "brier": ["test"],
     }
     n_brier_ts = 50
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
