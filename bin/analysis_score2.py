@@ -21,8 +21,8 @@ def main():
     _n_male = 121333
     n_female_over_3 = 54227
     n_male_over_3 = 40444
-    #dry_run = False
-    dry_run = True
+    dry_run = False
+    #dry_run = True
 
     # set up parameters
     if dry_run:
@@ -30,10 +30,9 @@ def main():
         n_test = 20
     else:
         ns = [
-                200,
-            #1000,
-            #4000,
-            #5000,
+            3000,
+            4000,
+            5000,
             #6000,
             #7000,
             #8000,
@@ -60,7 +59,7 @@ def main():
     # more set-up
     n_gammas = 50
     gamma_min = 1e-8
-    gamma_max = 1e-2
+    gamma_max = 1e0
     covs = get_covs(model)
     simplex_resolution = 0.05
     a = 1

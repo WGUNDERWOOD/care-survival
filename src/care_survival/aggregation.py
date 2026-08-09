@@ -48,6 +48,7 @@ class CARE:
             kernel_estimator.fit(beta_hat, inv_hessian_hat)
             inv_hessian_hat = kernel_estimator.inv_hessian_hat
             beta_hat = kernel_estimator.beta_hat
+            print(kernel_estimator.beta_hat[0])
 
             for j in range(self.n_thetas):
                 # fit convex estimator at theta
