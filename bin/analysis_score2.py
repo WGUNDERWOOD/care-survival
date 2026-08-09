@@ -33,39 +33,40 @@ def main():
             3000,
             4000,
             5000,
-            #6000,
-            #7000,
-            #8000,
-            #9000,
-            #10000,
-            #12000,
-            #14000,
-            #16000,
-            #18000,
-            #20000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            12000,
+            14000,
+            16000,
+            18000,
+            20000,
             #25000,
             #30000,
             #35000,
         ]
         if sex == "female":
             #ns.append([40000, 45000, 50000, n_female_over_3])
-            #n_test = n_female_over_3
-            n_test = max(ns)
+            n_test = n_female_over_3
+            #n_test = max(ns)
         elif sex == "male":
             #ns.append([n_male_over_3])
-            #n_test = n_male_over_3
-            n_test = max(ns)
+            n_test = n_male_over_3
+            #n_test = max(ns)
 
     # more set-up
     n_gammas = 50
     gamma_min = 1e-8
-    gamma_max = 1e0
+    gamma_max = 1e-2
     covs = get_covs(model)
     simplex_resolution = 0.05
     a = 1
     p = 2
     kernel = care_kernels.PolynomialKernel(a, p)
     with_metrics = {
+        "ln": ["valid", "test"],
         "concordance": ["test"],
         "brier": ["test"],
     }
