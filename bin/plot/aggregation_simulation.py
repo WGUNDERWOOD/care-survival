@@ -7,7 +7,7 @@ import pandas as pd
 import common
 
 
-def plot_aggregation(csv_path, plot_path, dgp):
+def plot_aggregation(csv_path, plot_path, dgp, metric):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "dgp_" + dgp in f]
     df_all = pd.concat(pd.read_csv(f) for f in csv_files)
@@ -15,16 +15,16 @@ def plot_aggregation(csv_path, plot_path, dgp):
     df = df_all.groupby("n").mean()
     n_rep = df_all["rep"].nunique()
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
-    cols = ["l2_tilde", "l2_hat", "l2_check", "l2_dagger"]
+    cols = [f"{metric}_tilde", f"{metric}_hat", f"{metric}_check", f"{metric}_dagger"]
     for c in cols:
         df[c + "_std"] = df_sd[c]
     df = df.sort_values(by="n")
-    df["l2_tilde"] = np.mean(df["l2_tilde"])
+    df[f"{metric}_tilde"] = np.mean(df[f"{metric}_tilde"])
     (fig, ax) = plt.subplots(figsize=(4, 3))
 
     # plot error band
     for c in cols:
-        if c != "l2_tilde":
+        if c != f"{metric}_tilde":
             plt.fill_between(
                 df.index,
                 df[c] - 2 * df[c + "_std"],
@@ -35,14 +35,14 @@ def plot_aggregation(csv_path, plot_path, dgp):
     # plot averages
     plt.plot(
         df.index,
-        df["l2_check"],
+        df[f"{metric}_check"],
         c="k",
         lw=1,
         label="CARE method $\\check f_{n,\\check\\gamma,\\check\\theta}$",
     )
     plt.plot(
         df.index,
-        df["l2_hat"],
+        df[f"{metric}_hat"],
         c="k",
         lw=1,
         ls="-.",
@@ -50,28 +50,32 @@ def plot_aggregation(csv_path, plot_path, dgp):
     )
     plt.plot(
         df.index,
-        df["l2_dagger"],
+        df[f"{metric}_dagger"],
         c="k",
         lw=1,
         ls="--",
         label="Oracle $\\check f_{n,\\gamma^\\dagger,\\theta^\\dagger}$",
     )
     plt.plot(
-        df.index, df["l2_tilde"], c="k", lw=1, ls=":", label="External $\\tilde f$"
+        df.index, df[f"{metric}_tilde"], c="k", lw=1, ls=":", label="External $\\tilde f$"
     )
 
     if dgp == "2":
         plt.ylim([0.33, 1.22])
 
     plt.xlabel("Sample size $n$")
-    plt.ylabel("$L_2$-error")
+    #plt.ylabel("$L_2$-error")
+    plt.ylabel(f"{metric}")
     plt.legend()
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
 
 
-for dgp in ["1", "2"]:
-    date = sys.argv[1]
-    csv_path = "data/" + date + "/simulation/analysis/"
-    plot_path = "plot/aggregation_dgp_" + dgp + ".pdf"
-    plot_aggregation(csv_path, plot_path, dgp)
+#for dgp in ["1", "2"]:
+for dgp in ["1"]:
+    for metric in ["l2", "concordance", "brier"]:
+        print(dgp, metric)
+        date = sys.argv[1]
+        csv_path = "data/" + date + "/simulation/analysis/"
+        plot_path = "plot/aggregation_dgp_" + dgp + "_" + metric + ".pdf"
+        plot_aggregation(csv_path, plot_path, dgp, metric)

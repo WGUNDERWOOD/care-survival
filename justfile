@@ -19,8 +19,8 @@ illustration_simulation:
     uv run bin/illustration_simulation.py 2
 
 analysis_simulation:
-    seq 1 {{REPS_SIM}} | parallel -j 4 --bar --lb uv run bin/analysis_simulation.py 1
-    #seq 1 {{REPS_SIM}} | parallel -j 4 --bar --lb uv run bin/analysis_simulation.py 2
+    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 1
+    #seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 2
 
 illustration_score2:
     uv run bin/illustration_score2.py female
@@ -52,7 +52,7 @@ plot_score2:
         selection_score2 \
 
 profile:
-    #uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1
+    uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1
     #uv run py-spy record -o profile.svg -- python bin/analysis_score2.py 1 female 1
 
 test:

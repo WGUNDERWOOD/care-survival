@@ -39,7 +39,7 @@ def main():
         #500,
     ]
     #n_test = 500
-    n_test = 200
+    n_test = 300
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
@@ -54,7 +54,7 @@ def main():
     with_metrics = {
             "ln": ["valid", "test"],
             "l2": ["test"],
-            #"concordance": ["test"],
+            "concordance": ["test"],
             #"brier": ["test"],
     }
     n_brier_ts = 100

@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import kendalltau
+import numba
 
 from care_survival import kernel_estimator as care_kernel_estimator
 
@@ -42,37 +43,63 @@ def get_l2_split(f, embedding, split):
         mse = np.sum(diffs**2) / max(n, 1)
         return np.sqrt(mse)
 
-def get_concordance_split(f, embedding, split):
-    embedding_data = embedding.data[split]
-    N = embedding_data.N
-    n = embedding_data.n
-    R = embedding_data.R
+@numba.njit(cache=True)
+def fenwick_tree(f, N, Z):
+    n = len(f)
+    order = np.argsort(f)
+    rank = np.empty(n, dtype=np.int64)
+    r = 0
+    rank[order[0]] = 0
+    for k in range(1, n):
+        if f[order[k]] != f[order[k - 1]]:
+            r += 1
+        rank[order[k]] = r
+    bit = np.empty(r + 2, dtype=np.int64)
+    bit[0] = 0
+    for k in range(1, len(bit)):
+        bit[k] = k & -k
+    fenwick = 0
+    i = 0
+    for j in range(n):
+        while i <= Z[j]:
+            k = rank[i] + 1
+            while k < len(bit):
+                bit[k] -= 1
+                k += k & -k
+            i += 1
+        if N[j]:
+            k = rank[j]
+            while k > 0:
+                fenwick += bit[k]
+                k -= k & -k
+    return fenwick
 
-    denominator = np.sum((n - R - 1) * N)
-    numerator = 0
+def get_concordance(f, N, Z, R, use_fenwick):
+    n = len(f)
+    denominator = np.sum((n - Z - 1) * N)
+    i = np.arange(n)
 
     if denominator > 0:
-
-        # old
-        #for j in np.where(N)[0]:
-            #i_range = np.arange(R[j], n).astype(int)
-            #numerator += np.sum(f[i_range] < f[j])
-
-        # new
-        j = np.flatnonzero(N)
-        i = np.arange(n)
-        chunk_size = 1024
-        for jj in np.array_split(j, max(1, len(j) // chunk_size)):
-            numerator += np.sum(
-                (i[None, :] >= R[jj, None]) &
-                (f[None, :] < f[jj, None])
-            )
+        if use_fenwick:
+            numerator = fenwick_tree(f, N, Z)
+        else:
+            numerator = sum(np.sum((np.arange(n) > Z[j]) * (f < f[j])) * N[j] for j in range(n))
 
         return numerator / denominator
     else:
         return 0
 
 
+def get_concordance_split(f, embedding, split):
+    embedding_data = embedding.data[split]
+    N = embedding_data.N
+    Z = embedding_data.Z
+    R = embedding_data.R
+    if embedding_data.n > 20:
+        use_fenwick = True
+    else:
+        use_fenwick = False
+    return get_concordance(f, N, Z, R, use_fenwick)
 
 
 def get_adjusted_breslow(f, embedding, split, brier_ts):
