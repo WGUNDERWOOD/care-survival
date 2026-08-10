@@ -38,11 +38,11 @@ def main():
             8000,
             9000,
             10000,
-            12000,
-            14000,
-            16000,
-            18000,
-            20000,
+            #12000,
+            #14000,
+            #16000,
+            #18000,
+            #20000,
             #25000,
             #30000,
             #35000,
@@ -57,13 +57,9 @@ def main():
             #n_test = max(ns)
 
     # more set-up
-    n_gammas = 50
-    gamma_min = 1e-8
-    gamma_max = 1e-2
-    covs = get_covs(model)
+    (covs, p, gamma_min, gamma_max, n_gammas) = get_model_params(model)
     simplex_resolution = 0.05
     a = 1
-    p = 2
     kernel = care_kernels.PolynomialKernel(a, p)
     with_metrics = {
         "ln": ["valid", "test"],
@@ -110,8 +106,8 @@ def main():
     write_summary(cares, rep, model, sex, path)
 
 
-def get_covs(model):
-    score2_covs = [
+def get_model_params(model):
+    covs = [
         "age",
         "hdl",
         "sbp",
@@ -122,12 +118,32 @@ def get_covs(model):
         "age_tchol",
         "age_smoking",
     ]
-    if model == 1:
-        score2_covs += ["imd"]
-    elif model == 2:
-        score2_covs += ["imd", "pgs000018", "pgs000039"]
 
-    return score2_covs
+    # model 1: no new covariates, RKHS predictor
+    # model 2: add imd, RKHS predictor
+    # model 3: add imd and pgs, RKHS predictor
+    # model 4: add imd, linear predictor, no regularisation
+    # model 5: add imd and pgs, linear predictor, no regularisation
+
+    # estimator
+    if model in [1, 2, 3]:
+        p = 2
+        gamma_min = 1e-8
+        gamma_max = 1e-2
+        n_gammas = 50
+    elif model in [4, 5]:
+        p = 1
+        gamma_min = 0.0
+        gamma_max = 0.0
+        n_gammas = 1
+
+    # covariates
+    if model in [2, 4]:
+        covs += ["imd"]
+    elif model in [3, 5]:
+        covs += ["imd", "pgs000018", "pgs000039"]
+
+    return (covs, p, gamma_min, gamma_max, n_gammas)
 
 
 def write_summary(cares, rep, model, sex, path):
