@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import kendalltau
 
 from care_survival import kernel_estimator as care_kernel_estimator
 
@@ -41,24 +42,38 @@ def get_l2_split(f, embedding, split):
         mse = np.sum(diffs**2) / max(n, 1)
         return np.sqrt(mse)
 
-
 def get_concordance_split(f, embedding, split):
     embedding_data = embedding.data[split]
-    I = embedding_data.I
+    N = embedding_data.N
     n = embedding_data.n
     R = embedding_data.R
-    valid = 1 - I
 
-    numerator = 0
-    for j in np.where(valid)[0]:
-        i_range = np.arange(R[j], n).astype(int)
-        numerator += np.sum((f[i_range] < f[j]) & (i_range != j))
+    denominator = np.sum((n - R - 1) * N)
 
-    denominator = np.sum((n - R - 1) * valid)
     if denominator > 0:
+
+        # old
+        #numerator = 0
+        #for j in np.where(N)[0]:
+            #i_range = np.arange(R[j], n).astype(int)
+            #numerator += np.sum(f[i_range] < f[j])
+
+        # new
+        j = np.flatnonzero(N)
+        i = np.arange(n)
+        numerator = 0
+        chunk_size = 1024
+        for jj in np.array_split(j, max(1, len(j) // chunk_size)):
+            numerator += np.sum(
+                (i[None, :] >= R[jj, None]) &
+                (f[None, :] < f[jj, None])
+            )
+
         return numerator / denominator
     else:
         return 0
+
+
 
 
 def get_adjusted_breslow(f, embedding, split, brier_ts):
