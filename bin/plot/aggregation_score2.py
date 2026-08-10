@@ -67,12 +67,12 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     else:
         plt.legend()
 
-    if model == "2" and sex == "female":
-        plt.ylim([0.7345, 0.753])
-        plt.yticks([0.735, 0.740, 0.745, 0.750])
-    if model == "1" and sex == "male":
-        plt.ylim([0.684, 0.7005])
-        plt.yticks([0.685, 0.690, 0.695, 0.700])
+    #if model == "2" and sex == "female":
+        #plt.ylim([0.7345, 0.753])
+        #plt.yticks([0.735, 0.740, 0.745, 0.750])
+    #if model == "1" and sex == "male":
+        #plt.ylim([0.684, 0.7005])
+        #plt.yticks([0.685, 0.690, 0.695, 0.700])
 
     plt.xlabel("Training/validation sample size $n$")
     plt.ylabel("Concordance index")
@@ -81,7 +81,7 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     plt.close("all")
 
 
-for model in ["1", "2"]:
+for model in ["1", "2", "3", "4", "5"]:
     for sex in ["female", "male"]:
         date = sys.argv[1]
         csv_path = "data/" + date + "/score2/analysis/"

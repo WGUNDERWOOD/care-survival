@@ -49,12 +49,12 @@ def main():
         ]
         if sex == "female":
             #ns.append([40000, 45000, 50000, n_female_over_3])
-            n_test = n_female_over_3
-            #n_test = max(ns)
+            #n_test = n_female_over_3
+            n_test = max(ns)
         elif sex == "male":
             #ns.append([n_male_over_3])
-            n_test = n_male_over_3
-            #n_test = max(ns)
+            #n_test = n_male_over_3
+            n_test = max(ns)
 
     # more set-up
     (covs, p, gamma_min, gamma_max, n_gammas) = get_model_params(model)
@@ -62,7 +62,7 @@ def main():
     a = 1
     kernel = care_kernels.PolynomialKernel(a, p)
     with_metrics = {
-        "ln": ["valid", "test"],
+        "ln": ["train", "valid", "test"],
         "concordance": ["test"],
         "brier": ["test"],
     }
