@@ -2,7 +2,7 @@
 REPS_SIM := "30"
 #REPS_SCORE2 := "20"
 REPS_SCORE2 := "2"
-DATE := "2026-08-09"
+DATE := "2026-08-10"
 
 default: simulation plot_simulation
 
@@ -57,3 +57,6 @@ profile:
 
 test:
     uv run pytest
+
+compress:
+    tar -czf data.tar.gz data/{{DATE}}
