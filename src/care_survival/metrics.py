@@ -49,11 +49,11 @@ def get_concordance_split(f, embedding, split):
     R = embedding_data.R
 
     denominator = np.sum((n - R - 1) * N)
+    numerator = 0
 
     if denominator > 0:
 
         # old
-        #numerator = 0
         #for j in np.where(N)[0]:
             #i_range = np.arange(R[j], n).astype(int)
             #numerator += np.sum(f[i_range] < f[j])
@@ -61,7 +61,6 @@ def get_concordance_split(f, embedding, split):
         # new
         j = np.flatnonzero(N)
         i = np.arange(n)
-        numerator = 0
         chunk_size = 1024
         for jj in np.array_split(j, max(1, len(j) // chunk_size)):
             numerator += np.sum(

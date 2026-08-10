@@ -4,7 +4,7 @@
 #SBATCH -p icelake
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=32
 #SBATCH --mail-type=ALL
 #SBATCH --time=01:00:00
 #SBATCH --array=1-20
@@ -16,6 +16,9 @@ module load parallel
 module load ceuadmin/uv
 export I_MPI_PIN_DOMAIN=omp:compact
 export I_MPI_PIN_ORDER=scatter
+export OMP_NUM_THREADS=4
+export MKL_NUM_THREADS=4
+export OPENBLAS_NUM_THREADS=4
 cd $SLURM_SUBMIT_DIR
 echo "Started: $(date)"
 
@@ -25,6 +28,6 @@ echo "Started: $(date)"
 #! fi
 
 echo "Array ID: $SLURM_ARRAY_TASK_ID"
-parallel --lb uv run ./bin/analysis_score2.py {1} {2} {3} ::: 1 2 ::: female male ::: $SLURM_ARRAY_TASK_ID
+parallel -j 4 --lb uv run ./bin/analysis_score2.py {1} {2} {3} ::: 1 2 ::: female male ::: $SLURM_ARRAY_TASK_ID
 
 echo "Finished: $(date)"
