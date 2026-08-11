@@ -104,7 +104,7 @@ def get_concordance_split(f, embedding, split):
 
 def get_adjusted_breslow(T, N, sn, brier_ts, T_leq_t):
     n = len(T)
-    N_over_sn = T_leq_t * N[:, None] / (sn[:, None] * n)
+    N_over_sn = T_leq_t * (N / sn)[:, None] / n
     p = np.sum(N_over_sn, axis=0)
     return np.exp(-p)
 
