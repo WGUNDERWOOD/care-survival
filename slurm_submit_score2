@@ -28,6 +28,6 @@ echo "Started: $(date)"
 #! fi
 
 echo "Array ID: $SLURM_ARRAY_TASK_ID"
-parallel -j 4 --lb uv run ./bin/analysis_score2.py {1} {2} {3} ::: 1 2 ::: female male ::: $SLURM_ARRAY_TASK_ID
+parallel -j 1 --lb uv run ./bin/analysis_score2.py {1} {2} {3} ::: 1 2 3 4 5 ::: female male ::: $SLURM_ARRAY_TASK_ID
 
 echo "Finished: $(date)"
