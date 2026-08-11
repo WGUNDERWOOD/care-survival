@@ -66,7 +66,7 @@ def main():
         "concordance": ["test"],
         "brier": ["test"],
     }
-    n_brier_ts = 100
+    n_brier_ts = 50
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
     verbose = True
