@@ -43,16 +43,16 @@ def main():
             16000,
             18000,
             20000,
-            #25000,
-            #30000,
-            #35000,
+            25000,
+            30000,
+            35000,
         ]
         if sex == "female":
-            #ns.append([40000, 45000, 50000, n_female_over_3])
+            ns.append([40000, 45000, 50000, n_female_over_3])
             n_test = n_female_over_3
             #n_test = max(ns)
         elif sex == "male":
-            #ns.append([n_male_over_3])
+            ns.append([n_male_over_3])
             n_test = n_male_over_3
             #n_test = max(ns)
 
