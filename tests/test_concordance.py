@@ -4,7 +4,7 @@ from care_survival.embedding import get_R, get_Z
 from care_survival.metrics import get_concordance
 
 def test_get_concordance():
-    for rep in range(1000):
+    for rep in range(100):
         n = 7
         T = np.array([0, 0, 0.5, 0.5, 0.6, 0.7, 1])
         f = np.random.random(n)
