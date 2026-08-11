@@ -1,8 +1,8 @@
 #REPS_SIM := "200"
-REPS_SIM := "200"
+REPS_SIM := "5"
 #REPS_SCORE2 := "20"
 REPS_SCORE2 := "2"
-DATE := "2026-08-10"
+DATE := "2026-08-11"
 
 default: simulation plot_simulation
 
@@ -19,8 +19,8 @@ illustration_simulation:
     uv run bin/illustration_simulation.py 2
 
 analysis_simulation:
-    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 1
-    #seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 2
+    seq 1 {{REPS_SIM}} | parallel -j 1 --bar --lb uv run bin/analysis_simulation.py 1
+    #seq 1 {{REPS_SIM}} | parallel -j 1 --bar --lb uv run bin/analysis_simulation.py 2
 
 illustration_score2:
     uv run bin/illustration_score2.py female
@@ -52,7 +52,7 @@ plot_score2:
         selection_score2 \
 
 profile:
-    uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1
+    time uv run py-spy record -o profile.svg -- python bin/analysis_simulation.py 1 1
     #uv run py-spy record -o profile.svg -- python bin/analysis_score2.py 1 female 1
 
 test:

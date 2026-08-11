@@ -11,7 +11,7 @@ def plot_aggregation(csv_path, plot_path, dgp, metric):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "dgp_" + dgp in f]
     df_all = pd.concat(pd.read_csv(f) for f in csv_files)
-    df_all = df_all[df_all["n"] >= 30]
+    #df_all = df_all[df_all["n"] >= 30]
     df = df_all.groupby("n").mean()
     n_rep = df_all["rep"].nunique()
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)

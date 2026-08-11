@@ -16,30 +16,30 @@ def main():
     today = datetime.now().strftime("%Y-%m-%d")
 
     ns = [
-        10,
-        15,
-        20,
-        25,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
+        #10,
+        #15,
+        #20,
+        #25,
+        #30,
+        #40,
+        #50,
+        #60,
+        #70,
+        #80,
+        #90,
         100,
         120,
-        #150,
-        #200,
-        #250,
-        #300,
+        150,
+        200,
+        250,
+        300,
         #350,
         #400,
         #450,
         #500,
     ]
-    n_test = 500
-    #n_test = 300
+    #n_test = 500
+    n_test = 200
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
@@ -55,11 +55,12 @@ def main():
             "ln": ["valid", "test"],
             "l2": ["test"],
             "concordance": ["test"],
-            #"brier": ["test"],
+            "brier": ["test"],
     }
     n_brier_ts = 100
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
-    verbose = False
+    #verbose = False
+    verbose = True
     cares = []
 
     for n in ns:
