@@ -28,7 +28,7 @@ def main():
         80,
         90,
         100,
-        #120,
+        120,
         #150,
         #200,
         #250,
@@ -38,8 +38,8 @@ def main():
         #450,
         #500,
     ]
-    #n_test = 500
-    n_test = 300
+    n_test = 500
+    #n_test = 300
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
