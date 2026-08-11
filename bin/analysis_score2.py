@@ -31,30 +31,30 @@ def main():
     else:
         ns = [
             3000,
-            #4000,
-            #5000,
-            #6000,
-            #7000,
-            #8000,
-            #9000,
-            #10000,
-            #12000,
-            #14000,
-            #16000,
-            #18000,
-            #20000,
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            12000,
+            14000,
+            16000,
+            18000,
+            20000,
             #25000,
             #30000,
             #35000,
         ]
         if sex == "female":
             #ns.append([40000, 45000, 50000, n_female_over_3])
-            #n_test = n_female_over_3
-            n_test = max(ns)
+            n_test = n_female_over_3
+            #n_test = max(ns)
         elif sex == "male":
             #ns.append([n_male_over_3])
-            #n_test = n_male_over_3
-            n_test = max(ns)
+            n_test = n_male_over_3
+            #n_test = max(ns)
 
     # more set-up
     (covs, p, gamma_min, gamma_max, n_gammas) = get_model_params(model)
@@ -66,7 +66,7 @@ def main():
         "concordance": ["test"],
         "brier": ["test"],
     }
-    n_brier_ts = 50
+    n_brier_ts = 25
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
     verbose = True
@@ -130,8 +130,8 @@ def get_model_params(model):
         p = 2
         gamma_min = 1e-8
         gamma_max = 1e-2
-        #n_gammas = 50
-        n_gammas = 2
+        n_gammas = 50
+        #n_gammas = 2
     elif model in [4, 5]:
         p = 1
         gamma_min = 0.0
