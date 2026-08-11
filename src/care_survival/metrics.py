@@ -102,45 +102,38 @@ def get_concordance_split(f, embedding, split):
     return get_concordance(f, N, Z, R, use_fenwick)
 
 
-def get_adjusted_breslow(T, N, sn, brier_ts, T_leq_t):
+@numba.njit()
+def brier_loop(T, N, ef, G_T, p, G_ts, k):
     n = len(T)
-    N_over_sn = T_leq_t * (N / sn)[:, None] / n
-    p = np.sum(N_over_sn, axis=0)
-    return np.exp(-p)
+    m = len(k)
+    out = np.empty(m)
+    for j in range(m):
+        log_s0 = -p[j]
+        kj = k[j]
+        term1 = 0.0
+        term2 = 0.0
+        for i in range(kj):
+            S = np.exp(ef[i] * log_s0)
+            term1 += N[i] * S * S / G_T[i]
+        for i in range(kj, n):
+            S = np.exp(ef[i] * log_s0)
+            x = 1.0 - S
+            term2 += x * x
+        out[j] = (term1 + term2 / G_ts[j]) / n
+    return out
 
 
-def get_survival_probability(T, N, sn, f, brier_ts, T_leq_t):
-    adjusted_breslow = get_adjusted_breslow(T, N, sn, brier_ts, T_leq_t)
-    survival_probability = adjusted_breslow[None, :] ** np.exp(f)[:, None]
-    return survival_probability
-
-
-def get_censoring_breslow(T, I, R_bar, f, brier_ts, T_leq_t):
+def get_pointwise_brier(T, N, I, Z, R_bar, sn, f, brier_ts):
     n = len(T)
-    NC_over_R = T_leq_t * I[:, None] / (R_bar[:, None] * n)
-    p = np.sum(NC_over_R, axis=0)
-    return np.exp(-p)
-
-
-def get_censoring_breslow_T(I, Z, R_bar, f):
-    n = len(I)
-    I_over_R = I / (R_bar * n)
-    cumulative_sum = np.cumsum(I_over_R)
-    p = cumulative_sum[Z.astype(int)]
-    return np.exp(-p)
-
-
-def get_pointwise_brier(T, N, I, Z, R_bar, sn, f, brier_ts, T_leq_t):
-    n = len(T)
-    survival_probability = get_survival_probability(T, N, sn, f, brier_ts, T_leq_t)
-    censoring_breslow_T = get_censoring_breslow_T(I, Z, R_bar, f)
-    censoring_breslow_ts = get_censoring_breslow(T, I, R_bar, f, brier_ts, T_leq_t)
-    numer1 = survival_probability**2 * T_leq_t * N[:, None]
-    term1 = np.sum(numer1 / censoring_breslow_T[:, None], axis=0) / n
-    numer2 = (1 - survival_probability)**2 * (1 - T_leq_t)
-    term2 = np.sum(numer2 / censoring_breslow_ts[None, :], axis=0) / n
-    return term1 + term2
-
+    k = np.searchsorted(T, brier_ts, side="right")
+    p = np.r_[0.0, np.cumsum(N / sn)][k] / n
+    G_ts = np.exp(-np.r_[0.0, np.cumsum(I / R_bar)][k] / n)
+    G_T = np.exp(
+        -np.cumsum(I / (R_bar * n))[Z.astype(np.int64)]
+    )
+    pointwise_brier = brier_loop(
+            T, N, np.exp(f), G_T, p, G_ts, k)
+    return pointwise_brier
 
 def get_brier_split(f, embedding, split, brier_ts):
     embedding_data = embedding.data[split]
@@ -150,8 +143,7 @@ def get_brier_split(f, embedding, split, brier_ts):
     Z = embedding_data.Z
     R_bar = embedding_data.R_bar
     sn = care_kernel_estimator.get_sn(embedding_data, np.exp(f))
-    T_leq_t = T[:, None] <= brier_ts[None, :]
-    pointwise_brier = get_pointwise_brier(T, N, I, Z, R_bar, sn, f, brier_ts, T_leq_t)
+    pointwise_brier = get_pointwise_brier(T, N, I, Z, R_bar, sn, f, brier_ts)
     brier = np.sum(pointwise_brier) / len(brier_ts)
     return brier
 

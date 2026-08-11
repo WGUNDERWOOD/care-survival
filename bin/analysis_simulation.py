@@ -22,42 +22,45 @@ def main():
         #25,
         #30,
         #40,
-        #50,
+        50,
         #60,
         #70,
         #80,
         #90,
-        100,
-        120,
-        150,
-        200,
-        250,
-        300,
+        #100,
+        #120,
+        #150,
+        #200,
+        #250,
+        #300,
         #350,
         #400,
         #450,
         #500,
     ]
     #n_test = 500
-    n_test = 200
+    n_test = 54000
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
-    kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
-    n_gammas = 50
+    #kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
+    kernel = care_kernels.PolynomialKernel(a, 2)
+    #n_gammas = 50
+    n_gammas = 5
     gamma_min = 1e-5
     gamma_max = 1e1
     ns.sort(reverse=True)
-    method = "kernel"
+    #method = "kernel"
+    method = "feature_map"
     simplex_resolution = 0.05
     np.random.seed(rep)
     with_metrics = {
             "ln": ["valid", "test"],
             "l2": ["test"],
-            "concordance": ["test"],
+            #"concordance": ["test"],
             "brier": ["test"],
     }
-    n_brier_ts = 100
+    n_brier_ts = 25
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
     #verbose = False
     verbose = True
