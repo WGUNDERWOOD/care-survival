@@ -48,11 +48,11 @@ def main():
             35000,
         ]
         if sex == "female":
-            ns.append([40000, 45000, 50000, n_female_over_3])
+            ns += [40000, 45000, 50000, n_female_over_3]
             n_test = n_female_over_3
             #n_test = max(ns)
         elif sex == "male":
-            ns.append([n_male_over_3])
+            ns += [n_male_over_3]
             n_test = n_male_over_3
             #n_test = max(ns)
 
@@ -131,7 +131,6 @@ def get_model_params(model):
         gamma_min = 1e-8
         gamma_max = 1e-2
         n_gammas = 50
-        #n_gammas = 2
     elif model in [4, 5]:
         p = 1
         gamma_min = 0.0

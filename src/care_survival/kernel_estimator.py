@@ -44,7 +44,7 @@ class KernelEstimator:
             Phi_bar = self.embedding.data["train"].Phi_bar
             feature_const = self.embedding.data["train"].feature_const
             beta_0 = -beta @ Phi_bar / feature_const
-            penalty = self.gamma * np.sum(beta**2) + beta_0**2
+            penalty = self.gamma * (np.sum(beta**2) + beta_0**2)
 
         lng = ln + penalty
         return lng
