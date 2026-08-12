@@ -18,7 +18,6 @@ def plot_brier_score2(csv_path, plot_path, sex):
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
     ct_all = df["brier_tilde"][df.index == max(df.index)]
     cc_all = df["brier_check"][df.index == max(df.index)]
-    #print(100 * ((cc_all - ct_all) / ct_all).values[0])
     cols = ["brier_check", "brier_hat", "brier_tilde"]
 
     for c in cols:
@@ -62,17 +61,17 @@ def plot_brier_score2(csv_path, plot_path, sex):
         label="SCORE2 model $\\tilde f$",
     )
 
-    if sex == "male" and model == "2":
-        plt.legend(loc="lower right", bbox_to_anchor=(0.5, 0.08, 0.5, 0.5))
-    else:
-        plt.legend()
+    #if sex == "male" and model == "2":
+        #plt.legend(loc="lower right", bbox_to_anchor=(0.5, 0.08, 0.5, 0.5))
+    #else:
+    plt.legend()
 
-    if model == "2" and sex == "female":
-        plt.ylim([0.7345, 0.753])
-        plt.yticks([0.735, 0.740, 0.745, 0.750])
-    if model == "1" and sex == "male":
-        plt.ylim([0.684, 0.7005])
-        plt.yticks([0.685, 0.690, 0.695, 0.700])
+    #if model == "2" and sex == "female":
+        #plt.ylim([0.7345, 0.753])
+        #plt.yticks([0.735, 0.740, 0.745, 0.750])
+    #if model == "1" and sex == "male":
+        #plt.ylim([0.684, 0.7005])
+        #plt.yticks([0.685, 0.690, 0.695, 0.700])
 
     plt.xlabel("Training/validation sample size $n$")
     plt.ylabel("Integrated Brier score")
@@ -81,7 +80,7 @@ def plot_brier_score2(csv_path, plot_path, sex):
     plt.close("all")
 
 
-for model in ["1", "2"]:
+for model in ["1", "2", "3", "4", "5"]:
     for sex in ["female", "male"]:
         date = sys.argv[1]
         csv_path = "data/" + date + "/score2/analysis/"
