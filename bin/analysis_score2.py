@@ -104,6 +104,7 @@ def main():
     path = f"./data/{today}/score2/analysis/"
     path += f"analysis_score2_model_{model}_{sex}_rep_{rep}.csv"
     write_summary(cares, rep, model, sex, path)
+    print(f"{now}, model = {model}, sex = {sex}, rep = {rep}, done", flush=True)
 
 
 def get_model_params(model):
