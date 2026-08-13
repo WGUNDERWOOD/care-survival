@@ -18,6 +18,7 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
     ct_all = df["concordance_tilde"][df.index == max(df.index)]
     cc_all = df["concordance_check"][df.index == max(df.index)]
+    print("Concordance improvement %:", 100 * ((cc_all - ct_all) / ct_all).values[0])
     cols = ["concordance_check", "concordance_hat", "concordance_tilde"]
 
     for c in cols:
@@ -82,6 +83,7 @@ def plot_aggregation_score2(csv_path, plot_path, sex):
 
 for model in ["1", "2", "3", "4", "5"]:
     for sex in ["female", "male"]:
+        print(f"Model {model}, {sex}")
         date = sys.argv[1]
         csv_path = "data/" + date + "/score2/analysis/"
         plot_path = "plot/aggregation_score2_model_" + model + "_" + sex + ".pdf"

@@ -16,8 +16,9 @@ def plot_brier_score2(csv_path, plot_path, sex):
     df = df_all.groupby("n").mean()
     n_rep = df_all["rep"].nunique()
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
-    ct_all = df["brier_tilde"][df.index == max(df.index)]
-    cc_all = df["brier_check"][df.index == max(df.index)]
+    bt_all = df["brier_tilde"][df.index == max(df.index)]
+    bc_all = df["brier_check"][df.index == max(df.index)]
+    print("Brier improvement %:", 100 * ((bt_all - bc_all) / bt_all).values[0])
     cols = ["brier_check", "brier_hat", "brier_tilde"]
 
     for c in cols:
@@ -82,6 +83,7 @@ def plot_brier_score2(csv_path, plot_path, sex):
 
 for model in ["1", "2", "3", "4", "5"]:
     for sex in ["female", "male"]:
+        print(f"Model {model}, {sex}")
         date = sys.argv[1]
         csv_path = "data/" + date + "/score2/analysis/"
         plot_path = "plot/brier_score2_model_" + model + "_" + sex + ".pdf"
