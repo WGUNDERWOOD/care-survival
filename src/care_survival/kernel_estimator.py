@@ -131,9 +131,10 @@ def get_Dsn(embedding_data, f_expt):
 
     if embedding_data.method in ["kernel", "nystrom"]:
         K_tilde = embedding_data.K_tilde
-        counter = np.array(np.arange(n))
-        A = (R.reshape(-1, 1) <= counter) * f_expt / n
-        return A @ K_tilde
+        A = K_tilde * f_expt.reshape(-1, 1)
+        B = np.cumsum(A[::-1, :], axis=0) / n
+        Dsn = B[n - R - 1, :]
+        return Dsn
 
     elif embedding_data.method == "feature_map":
         Phi_tilde = embedding_data.Phi_tilde
