@@ -13,7 +13,7 @@ def get_R_bar(T):
     return 1 - np.searchsorted(T, T, side="left") / len(T)
 
 class EmbeddingData:
-    def __init__(self, data, kernel, method):
+    def __init__(self, data, kernel, method, nystrom_m=None):
         data.sort()
         self.n = data.n
         self.d = data.d
@@ -24,6 +24,7 @@ class EmbeddingData:
         self.f_0 = data.f_0
         self.method = method
         self.N = 1 - self.I
+        self.nystrom_m = nystrom_m
 
         self.R = get_R(self.T)
         self.Z = get_Z(self.T)
@@ -42,6 +43,20 @@ class EmbeddingData:
                 + np.outer(self.K_bar, self.K_bar) * self.norm_one**2
             )
 
+        elif method == "nystrom":
+            self.nystrom_indices = np.random.choice(self.n, self.nystrom_m, replace=False)
+            self.nystrom_indices = np.sort(self.nystrom_indices)
+            self.norm_one = kernel.norm_one()
+            self.K = kernel.k(self.X, self.X[self.nystrom_indices])
+            self.K_bar = np.sum(self.K, axis=0) / self.n
+            self.K_tilde = self.K - self.K_bar
+            self.K_hat = (
+                self.K[self.nystrom_indices]
+                - self.K_bar
+                - self.K_bar.reshape(-1, 1)
+                + np.outer(self.K_bar, self.K_bar) * self.norm_one**2
+            )
+
         elif method == "feature_map":
             self.feature_dim = kernel.feature_dim(self.d)
             self.feature_const = kernel.feature_const()
@@ -55,12 +70,18 @@ class EmbeddingData:
         if self.method == "kernel":
             return np.zeros(self.n)
 
+        elif self.method == "nystrom":
+            return np.zeros(self.nystrom_m)
+
         elif self.method == "feature_map":
             return np.zeros(self.feature_dim)
 
     def get_default_inv_hessian(self):
         if self.method == "kernel":
             return np.eye(self.n)
+
+        if self.method == "nystrom":
+            return np.eye(self.nystrom_m)
 
         elif self.method == "feature_map":
             return np.eye(self.feature_dim)
@@ -74,11 +95,11 @@ class EmbeddingData:
 
 
 class Embedding:
-    def __init__(self, data_train, data_valid, data_test, kernel, method):
+    def __init__(self, data_train, data_valid, data_test, kernel, method, nystrom_m=None):
         self.data = {
-            "train": EmbeddingData(data_train, kernel, method),
-            "valid": EmbeddingData(data_valid, kernel, method),
-            "test": EmbeddingData(data_test, kernel, method),
+            "train": EmbeddingData(data_train, kernel, method, nystrom_m),
+            "valid": EmbeddingData(data_valid, kernel, method, nystrom_m),
+            "test": EmbeddingData(data_test, kernel, method, nystrom_m),
         }
 
         if method == "kernel":
@@ -88,5 +109,16 @@ class Embedding:
             )
             self.K_tilde_test_train = (
                 kernel.k(self.data["test"].X, self.data["train"].X)
+                - self.data["train"].K_bar
+            )
+
+        elif method == "nystrom":
+            nystrom_indices = self.data["train"].nystrom_indices
+            self.K_tilde_valid_train = (
+                kernel.k(self.data["valid"].X, self.data["train"].X[nystrom_indices])
+                - self.data["train"].K_bar
+            )
+            self.K_tilde_test_train = (
+                kernel.k(self.data["test"].X, self.data["train"].X[nystrom_indices])
                 - self.data["train"].K_bar
             )

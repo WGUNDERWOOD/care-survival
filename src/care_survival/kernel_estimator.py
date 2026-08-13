@@ -16,7 +16,7 @@ class KernelEstimator:
             self.feature_dim = embedding.data["train"].feature_dim
 
     def get_f(self, beta, split):
-        if self.method == "kernel":
+        if self.method in ["kernel", "nystrom"]:
             if split == "valid":
                 matrix = self.embedding.K_tilde_valid_train
             elif split == "test":
@@ -36,7 +36,7 @@ class KernelEstimator:
     def get_lng_split(self, beta, split):
         ln = self.get_ln_split(beta, split)
 
-        if self.method == "kernel":
+        if self.method in ["kernel", "nystrom"]:
             K_hat_train = self.embedding.data["train"].K_hat
             penalty = self.gamma * beta.T @ K_hat_train @ beta
 
@@ -59,13 +59,18 @@ class KernelEstimator:
         n = embedding_data.n
         N = embedding_data.N
 
-        if self.method == "kernel":
+        if self.method in ["kernel", "nystrom"]:
             K_tilde = embedding_data.K_tilde
             K_hat = embedding_data.K_hat
-            dlng = np.sum(
-                (Dsn.T / sn - K_tilde.T) * N / n + 2 * self.gamma * K_hat.T * beta,
+            dlng1 = np.sum(
+                (Dsn.T / sn - K_tilde.T) * N / n,
                 axis=1,
             )
+            dlng2 = np.sum(
+                2 * self.gamma * K_hat * beta,
+                axis=0,
+            )
+            dlng = dlng1 + dlng2
 
         elif self.method == "feature_map":
             Phi_tilde = embedding_data.Phi_tilde
@@ -124,7 +129,7 @@ def get_Dsn(embedding_data, f_expt):
     n = embedding_data.n
     R = embedding_data.R.astype(int)
 
-    if embedding_data.method == "kernel":
+    if embedding_data.method in ["kernel", "nystrom"]:
         K_tilde = embedding_data.K_tilde
         counter = np.array(np.arange(n))
         A = (R.reshape(-1, 1) <= counter) * f_expt / n
