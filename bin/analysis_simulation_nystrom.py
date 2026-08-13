@@ -26,11 +26,11 @@ def main():
         60,
         70,
         80,
-        #90,
-        #100,
-        #120,
-        #150,
-        #200,
+        90,
+        100,
+        120,
+        150,
+        200,
         #250,
         #300,
         #350,
@@ -38,9 +38,9 @@ def main():
         #450,
         #500,
     ]
-    nystrom_ms = [30, 30, 30, 30, 30, 30]
+    nystrom_ms = [30 for _ in ns]
     #nystrom_ms = ns
-    n_test = 500
+    n_test = 400
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
@@ -50,7 +50,7 @@ def main():
     gamma_max = 1e1
     ns.sort(reverse=True)
     method = "nystrom"
-    simplex_resolution = 0.05
+    simplex_resolution = 0.5
     np.random.seed(rep)
     with_metrics = {
             "ln": ["valid", "test"],
@@ -60,7 +60,8 @@ def main():
     }
     n_brier_ts = 25
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
-    verbose = True
+    #verbose = True
+    verbose = False
     cares = []
 
     for i in range(len(ns)):
@@ -101,6 +102,7 @@ def write_summary(cares, rep, path):
     results["n"] = results.n_train
     results["rep"] = rep
     results = results.drop(["n_train", "n_valid"], axis=1)
+    print(results[["n", "l2_hat", "l2_check"]])
     os.makedirs(os.path.dirname(path), exist_ok=True)
     results.to_csv(path)
 
