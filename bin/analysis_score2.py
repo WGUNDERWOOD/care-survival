@@ -16,7 +16,6 @@ def main():
     model = int(sys.argv[1])
     sex = sys.argv[2]
     rep = int(sys.argv[3])
-    method = "feature_map"
     _n_female = 162682
     _n_male = 121333
     n_female_over_3 = 54227
@@ -57,10 +56,11 @@ def main():
             #n_test = max(ns)
 
     # more set-up
-    (covs, p, gamma_min, gamma_max, n_gammas) = get_model_params(model)
-    simplex_resolution = 0.05
     a = 1
-    kernel = care_kernels.PolynomialKernel(a, p)
+    (covs, p, gamma_min, gamma_max, n_gammas, kernel, method) = get_model_params(model, a)
+    ns.sort(reverse=True)
+    nystrom_ms = [min(n, 100) for n in ns]
+    simplex_resolution = 0.05
     with_metrics = {
         "ln": ["train", "valid", "test"],
         "concordance": ["test"],
@@ -69,12 +69,13 @@ def main():
     n_brier_ts = 25
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
-    verbose = True
-    #verbose = False
-    ns.sort(reverse=True)
+    #verbose = True
+    verbose = False
     cares = []
 
-    for n in ns:
+    for i in range(len(ns)):
+        n = ns[i]
+        nystrom_m = nystrom_ms[i]
         now = datetime.now().strftime("%H:%M:%S.%f")
         print(f"{now}, model = {model}, sex = {sex}, rep = {rep}, n = {n}", flush=True)
 
@@ -83,7 +84,7 @@ def main():
             n, n, n_test, covs, sex, dry_run, rep
         )
         embedding = care_embedding.Embedding(
-            data_train, data_valid, data_test, kernel, method
+            data_train, data_valid, data_test, kernel, method, nystrom_m
         )
 
         # fit care estimator
@@ -107,7 +108,7 @@ def main():
     print(f"{now}, model = {model}, sex = {sex}, rep = {rep}, done", flush=True)
 
 
-def get_model_params(model):
+def get_model_params(model, a):
     covs = [
         "age",
         "hdl",
@@ -126,17 +127,25 @@ def get_model_params(model):
     # model 4: add imd, linear predictor, no regularisation
     # model 5: add imd and pgs, linear predictor, no regularisation
 
+    # models 6--10 are the same but with a Sobolev kernel and Nystrom
+
     # estimator
-    if model in [1, 2, 3]:
+    if model in [1, 2, 3, 6, 7, 8]:
         p = 2
-        gamma_min = 1e-8
-        gamma_max = 1e-2
+        gamma_min = 1e-10
+        gamma_max = 1e-4
         n_gammas = 50
-    elif model in [4, 5]:
+    elif model in [4, 5, 9, 10]:
         p = 1
         gamma_min = 0.0
         gamma_max = 0.0
         n_gammas = 1
+    if model in [1, 2, 3, 4, 5]:
+        kernel = care_kernels.PolynomialKernel(a, p)
+        method = "feature_map"
+    elif model in [6, 7, 8, 9, 10]:
+        kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
+        method = "kernel"
 
     # covariates
     if model in [2, 4]:
@@ -144,7 +153,7 @@ def get_model_params(model):
     elif model in [3, 5]:
         covs += ["imd", "pgs000018", "pgs000039"]
 
-    return (covs, p, gamma_min, gamma_max, n_gammas)
+    return (covs, p, gamma_min, gamma_max, n_gammas, kernel, method)
 
 
 def write_summary(cares, rep, model, sex, path):
