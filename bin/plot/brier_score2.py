@@ -81,7 +81,7 @@ def plot_brier_score2(csv_path, plot_path, sex):
     plt.close("all")
 
 
-for model in ["1", "2", "3", "4", "5"]:
+for model in [str(s) for s in range(1, 11)]:
     for sex in ["female", "male"]:
         print(f"Model {model}, {sex}")
         date = sys.argv[1]
