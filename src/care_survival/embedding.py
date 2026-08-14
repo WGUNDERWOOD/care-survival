@@ -13,7 +13,7 @@ def get_R_bar(T):
     return 1 - np.searchsorted(T, T, side="left") / len(T)
 
 class EmbeddingData:
-    def __init__(self, data, kernel, method, nystrom_m=None):
+    def __init__(self, data, kernel, method, split, nystrom_m):
         data.sort()
         self.n = data.n
         self.d = data.d
@@ -32,45 +32,32 @@ class EmbeddingData:
         self.ln_cent = np.sum(np.log(self.R_bar) * self.N) / max(self.n, 1)
 
         if method == "kernel":
-            self.norm_one = kernel.norm_one()
-            self.K = kernel.k(self.X, self.X)
-            self.K_bar = np.sum(self.K, axis=0) / self.n
-            self.K_tilde = self.K - self.K_bar
-            self.K_hat = (
-                self.K
-                - self.K_bar
-                - self.K_bar.reshape(-1, 1)
-                + np.outer(self.K_bar, self.K_bar) * self.norm_one**2
-            )
-
-        elif method == "nystrom":
             self.nystrom_indices = np.random.choice(self.n, self.nystrom_m, replace=False)
             self.nystrom_indices = np.sort(self.nystrom_indices)
             self.norm_one = kernel.norm_one()
-            self.K = kernel.k(self.X, self.X[self.nystrom_indices])
-            self.K_bar = np.sum(self.K, axis=0) / self.n
-            self.K_tilde = self.K - self.K_bar
-            self.K_hat = (
-                self.K[self.nystrom_indices]
-                - self.K_bar
-                - self.K_bar.reshape(-1, 1)
-                + np.outer(self.K_bar, self.K_bar) * self.norm_one**2
-            )
+            if split == "train":
+                self.K = kernel.k(self.X, self.X[self.nystrom_indices])
+                self.K_bar = np.sum(self.K, axis=0) / self.n
+                self.K_tilde = self.K - self.K_bar
+                self.K_hat = (
+                    self.K[self.nystrom_indices]
+                    - self.K_bar
+                    - self.K_bar.reshape(-1, 1)
+                    + np.outer(self.K_bar, self.K_bar) * self.norm_one**2
+                )
 
         elif method == "feature_map":
             self.feature_dim = kernel.feature_dim(self.d)
             self.feature_const = kernel.feature_const()
-            self.Phi = kernel.phi(self.X)
-            self.Phi_bar = np.sum(self.Phi, axis=0) / max(self.n, 1)
-            self.Phi_tilde = self.Phi - self.Phi_bar
+            if split == "train":
+                self.Phi = kernel.phi(self.X)
+                self.Phi_bar = np.sum(self.Phi, axis=0) / max(self.n, 1)
+                self.Phi_tilde = self.Phi - self.Phi_bar
 
         self.breslow = self.get_breslow()
 
     def get_default_beta(self):
         if self.method == "kernel":
-            return np.zeros(self.n)
-
-        elif self.method == "nystrom":
             return np.zeros(self.nystrom_m)
 
         elif self.method == "feature_map":
@@ -78,9 +65,6 @@ class EmbeddingData:
 
     def get_default_inv_hessian(self):
         if self.method == "kernel":
-            return np.eye(self.n)
-
-        if self.method == "nystrom":
             return np.eye(self.nystrom_m)
 
         elif self.method == "feature_map":
@@ -95,30 +79,20 @@ class EmbeddingData:
 
 
 class Embedding:
-    def __init__(self, data_train, data_valid, data_test, kernel, method, nystrom_m=None):
+    def __init__(self, data_train, data_valid, data_test, kernel, method, nystrom_m):
         self.data = {
-            "train": EmbeddingData(data_train, kernel, method, nystrom_m),
-            "valid": EmbeddingData(data_valid, kernel, method, nystrom_m),
-            "test": EmbeddingData(data_test, kernel, method, nystrom_m),
+            "train": EmbeddingData(data_train, kernel, method, "train", nystrom_m),
+            "valid": EmbeddingData(data_valid, kernel, method, "valid", nystrom_m),
+            "test": EmbeddingData(data_test, kernel, method, "test", nystrom_m),
         }
 
         if method == "kernel":
-            self.K_tilde_valid_train = (
-                kernel.k(self.data["valid"].X, self.data["train"].X)
-                - self.data["train"].K_bar
-            )
-            self.K_tilde_test_train = (
-                kernel.k(self.data["test"].X, self.data["train"].X)
-                - self.data["train"].K_bar
-            )
-
-        elif method == "nystrom":
             nystrom_indices = self.data["train"].nystrom_indices
             self.K_tilde_valid_train = (
-                kernel.k(self.data["valid"].X, self.data["train"].X[nystrom_indices])
+                kernel.k(data_valid.X, data_train.X[nystrom_indices])
                 - self.data["train"].K_bar
             )
             self.K_tilde_test_train = (
-                kernel.k(self.data["test"].X, self.data["train"].X[nystrom_indices])
+                kernel.k(data_test.X, data_train.X[nystrom_indices])
                 - self.data["train"].K_bar
             )

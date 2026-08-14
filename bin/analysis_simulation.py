@@ -22,7 +22,7 @@ def main():
         #25,
         #30,
         #40,
-        50,
+        #50,
         #60,
         #70,
         #80,
@@ -37,27 +37,27 @@ def main():
         #400,
         #450,
         #500,
+        #1000,
+        #2000,
+        3000,
     ]
-    #n_test = 500
-    n_test = 54000
+    nystrom_ms = [min(n, 50) for n in ns]
+    n_test = 400
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
-    #kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
-    kernel = care_kernels.PolynomialKernel(a, 2)
-    #n_gammas = 50
-    n_gammas = 5
+    kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
+    n_gammas = 50
     gamma_min = 1e-5
     gamma_max = 1e1
     ns.sort(reverse=True)
-    #method = "kernel"
-    method = "feature_map"
+    method = "kernel"
     simplex_resolution = 0.05
     np.random.seed(rep)
     with_metrics = {
             "ln": ["valid", "test"],
             "l2": ["test"],
-            #"concordance": ["test"],
+            "concordance": ["test"],
             "brier": ["test"],
     }
     n_brier_ts = 25
@@ -66,7 +66,9 @@ def main():
     verbose = True
     cares = []
 
-    for n in ns:
+    for i in range(len(ns)):
+        n = ns[i]
+        nystrom_m = nystrom_ms[i]
         now = datetime.now().strftime("%H:%M:%S.%f")
         print(f"{now}, dgp = {dgp}, rep = {rep}, n = {n}", flush=True)
         # data
@@ -74,7 +76,7 @@ def main():
         data_valid = distribution.sample(n)
         data_test = distribution.sample(n_test)
         embedding = care_embedding.Embedding(
-            data_train, data_valid, data_test, kernel, method
+            data_train, data_valid, data_test, kernel, method, nystrom_m
         )
 
         # fit care estimator
