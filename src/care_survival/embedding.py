@@ -49,10 +49,9 @@ class EmbeddingData:
         elif method == "feature_map":
             self.feature_dim = kernel.feature_dim(self.d)
             self.feature_const = kernel.feature_const()
-            if split == "train":
-                self.Phi = kernel.phi(self.X)
-                self.Phi_bar = np.sum(self.Phi, axis=0) / max(self.n, 1)
-                self.Phi_tilde = self.Phi - self.Phi_bar
+            self.Phi = kernel.phi(self.X)
+            self.Phi_bar = np.sum(self.Phi, axis=0) / max(self.n, 1)
+            self.Phi_tilde = self.Phi - self.Phi_bar
 
         self.breslow = self.get_breslow()
 

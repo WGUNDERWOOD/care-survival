@@ -34,13 +34,18 @@ gamma_max = 1e1
 # set up the simplex tuning parameters
 simplex_resolution = 0.05
 
-# compute concordance and integrated brier score on all data
+# set Nystrom approximation subsample size
+nystrom_m = 50
+
+# compute concordance and integrated Brier score on all data
 with_metrics = {
     "ln": ["train", "valid"],
     "l2": ["train", "valid"],
     "concordance": ["train", "valid"],
     "brier": ["train", "valid"],
 }
+
+# number of time points for integrated Brier score
 n_brier_ts = 20
 
 # fit CARE
@@ -61,6 +66,7 @@ care = care_survival.care(
     simplex_resolution,
     with_metrics,
     n_brier_ts,
+    nystrom_m
 )
 
 # view diagnostics

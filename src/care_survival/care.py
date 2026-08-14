@@ -22,6 +22,7 @@ def care(
     simplex_resolution,
     with_metrics,
     n_brier_ts,
+    nystrom_m,
     verbose=False,
 ):
     # get parameters from shape of data
@@ -58,7 +59,7 @@ def care(
 
     # compute kernel embedding
     embedding = care_embedding.Embedding(
-        data_train, data_valid, data_test, kernel, method
+        data_train, data_valid, data_test, kernel, method, nystrom_m
     )
 
     # fit CARE estimator
