@@ -9,3 +9,4 @@ data/
 *.out
 profile.svg
 *.tar.gz
+*.swp
