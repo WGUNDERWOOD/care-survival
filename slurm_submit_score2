@@ -4,10 +4,10 @@
 #SBATCH -p icelake
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=6
 #SBATCH --mail-type=ALL
-#SBATCH --time=06:00:00
-#SBATCH --array=1-20
+#SBATCH --time=01:00:00
+#SBATCH --array=201-400
 
 #! Set up modules and environment
 . /etc/profile.d/modules.sh
@@ -22,13 +22,22 @@ export OPENBLAS_NUM_THREADS=4
 cd $SLURM_SUBMIT_DIR
 echo "Started: $(date)"
 
-#! Run commands
+#! Unpack job array
+MODEL=$(( ($SLURM_ARRAY_TASK_ID - 1) / 40 + 1 ))
+SEX_ID=$(( (($SLURM_ARRAY_TASK_ID - 1) % 40) / 20 ))
+if (( SEX_ID == 0 )); then
+    SEX="female"
+else
+    SEX="male"
+fi
+REP=$(( ($SLURM_ARRAY_TASK_ID - 1) % 20 + 1 ))
+
+#! Run jobs
 #! if [[ "$SLURM_ARRAY_TASK_ID" == 1 ]]; then
     #! parallel --lb ./target/release/illustration_score2 {1} ::: female male
 #! fi
 
 echo "Array ID: $SLURM_ARRAY_TASK_ID"
-#parallel --lb -j 1 uv run ./bin/analysis_score2.py {1} {2} {3} ::: 1 2 3 4 5 ::: female male ::: $SLURM_ARRAY_TASK_ID
-parallel --lb -j 8 uv run ./bin/analysis_score2.py {1} {2} {3} ::: 6 7 8 9 10 ::: female male ::: $SLURM_ARRAY_TASK_ID
+uv run ./bin/analysis_score2.py $MODEL $SEX $REP
 
 echo "Finished: $(date)"

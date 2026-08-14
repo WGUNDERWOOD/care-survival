@@ -69,8 +69,8 @@ def main():
     n_brier_ts = 25
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
 
-    #verbose = True
-    verbose = False
+    verbose = True
+    #verbose = False
     cares = []
 
     for i in range(len(ns)):
@@ -132,8 +132,8 @@ def get_model_params(model, a):
     # estimator
     if model in [1, 2, 3, 6, 7, 8]:
         p = 2
-        gamma_min = 1e-10
-        gamma_max = 1e-4
+        gamma_min = 1e-8
+        gamma_max = 1e-2
         n_gammas = 50
     elif model in [4, 5, 9, 10]:
         p = 1
