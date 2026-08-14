@@ -74,16 +74,13 @@ def fenwick_tree(f, N, Z):
                 k -= k & -k
     return fenwick
 
-def get_concordance(f, N, Z, R, use_fenwick):
+def get_concordance(f, N, Z, R):
     n = len(f)
     denominator = np.sum((n - Z - 1) * N)
     i = np.arange(n)
 
     if denominator > 0:
-        if use_fenwick:
-            numerator = fenwick_tree(f, N, Z)
-        else:
-            numerator = sum(np.sum((np.arange(n) > Z[j]) * (f < f[j])) * N[j] for j in range(n))
+        numerator = fenwick_tree(f, N, Z)
 
         return numerator / denominator
     else:
@@ -95,11 +92,7 @@ def get_concordance_split(f, embedding, split):
     N = embedding_data.N
     Z = embedding_data.Z
     R = embedding_data.R
-    if embedding_data.n > 20:
-        use_fenwick = True
-    else:
-        use_fenwick = False
-    return get_concordance(f, N, Z, R, use_fenwick)
+    return get_concordance(f, N, Z, R)
 
 
 @numba.njit()

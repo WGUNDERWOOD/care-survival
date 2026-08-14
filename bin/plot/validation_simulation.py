@@ -49,6 +49,7 @@ def plot_validation(csv_path, plot_path, dgp):
     plt.close("all")
 
 
+#for dgp in ["1"]:
 for dgp in ["1", "2"]:
     date = sys.argv[1]
     csv_path = "data/" + date + "/simulation"

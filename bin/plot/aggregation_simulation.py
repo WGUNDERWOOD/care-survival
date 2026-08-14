@@ -11,7 +11,7 @@ def plot_aggregation(csv_path, plot_path, dgp, metric):
     csv_files = glob.glob(os.path.join(csv_path, "*.csv"))
     csv_files = [f for f in csv_files if "dgp_" + dgp in f]
     df_all = pd.concat(pd.read_csv(f) for f in csv_files)
-    #df_all = df_all[df_all["n"] >= 30]
+    df_all = df_all[df_all["n"] >= 30]
     df = df_all.groupby("n").mean()
     n_rep = df_all["rep"].nunique()
     df_sd = df_all.groupby("n").std() / (n_rep**0.5)
@@ -21,6 +21,7 @@ def plot_aggregation(csv_path, plot_path, dgp, metric):
     df = df.sort_values(by="n")
     df[f"{metric}_tilde"] = np.mean(df[f"{metric}_tilde"])
     (fig, ax) = plt.subplots(figsize=(4, 3))
+
 
     # plot error band
     for c in cols:
@@ -60,19 +61,21 @@ def plot_aggregation(csv_path, plot_path, dgp, metric):
         df.index, df[f"{metric}_tilde"], c="k", lw=1, ls=":", label="External $\\tilde f$"
     )
 
-    if dgp == "2":
-        plt.ylim([0.33, 1.22])
+    if metric == "l2":
+        plt.ylabel("$L_2$-error")
+    elif metric == "concordance":
+        plt.ylabel("Concordance index")
+    elif metric == "brier":
+        plt.ylabel("Integrated Brier score")
 
     plt.xlabel("Sample size $n$")
-    #plt.ylabel("$L_2$-error")
-    plt.ylabel(f"{metric}")
     plt.legend()
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close("all")
 
 
-#for dgp in ["1", "2"]:
-for dgp in ["1"]:
+#for dgp in ["1"]:
+for dgp in ["1", "2"]:
     for metric in ["l2", "concordance", "brier"]:
         print(dgp, metric)
         date = sys.argv[1]

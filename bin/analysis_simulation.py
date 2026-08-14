@@ -16,33 +16,32 @@ def main():
     today = datetime.now().strftime("%Y-%m-%d")
 
     ns = [
-        #10,
-        #15,
-        #20,
-        #25,
-        #30,
-        #40,
-        #50,
-        #60,
-        #70,
-        #80,
-        #90,
-        #100,
-        #120,
-        #150,
-        #200,
-        #250,
-        #300,
-        #350,
-        #400,
-        #450,
-        #500,
-        #1000,
-        #2000,
-        3000,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        120,
+        150,
+        200,
+        250,
+        300,
+        350,
+        400,
+        450,
+        500,
+        600,
+        700,
+        800,
+        900,
+        1000,
     ]
-    nystrom_ms = [min(n, 50) for n in ns]
-    n_test = 400
+    ns.sort(reverse=True)
+    nystrom_ms = [min(n, 60) for n in ns]
+    n_test = 500
 
     distribution = care_distributions.get_distribution(dgp)
     a = 1
@@ -50,7 +49,6 @@ def main():
     n_gammas = 50
     gamma_min = 1e-5
     gamma_max = 1e1
-    ns.sort(reverse=True)
     method = "kernel"
     simplex_resolution = 0.05
     np.random.seed(rep)
@@ -62,8 +60,8 @@ def main():
     }
     n_brier_ts = 25
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
-    #verbose = False
-    verbose = True
+    verbose = False
+    #verbose = True
     cares = []
 
     for i in range(len(ns)):

@@ -17,6 +17,7 @@ def main():
 
     # data
     n = 200
+    nystrom_m = 100
     distribution = care_distributions.get_distribution(dgp)
     data_train = distribution.sample(n)
     data_valid = distribution.sample(n)
@@ -27,7 +28,7 @@ def main():
     kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
     method = "kernel"
     embedding = care_embedding.Embedding(
-        data_train, data_valid, data_test, kernel, method
+        data_train, data_valid, data_test, kernel, method, nystrom_m
     )
 
     # run CARE
