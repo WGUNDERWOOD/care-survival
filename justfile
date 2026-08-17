@@ -2,7 +2,7 @@
 REPS_SIM := "30"
 #REPS_SCORE2 := "20"
 REPS_SCORE2 := "2"
-DATE := "2026-08-14"
+DATE := "2026-08-17"
 
 default: simulation plot_simulation
 
@@ -19,8 +19,10 @@ illustration_simulation:
     uv run bin/illustration_simulation.py 2
 
 analysis_simulation:
-    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 1
-    seq 1 {{REPS_SIM}} | parallel --bar --lb uv run bin/analysis_simulation.py 2
+    parallel --bar --lb \
+        'uv run bin/analysis_simulation.py {1} {2}' \
+        ::: $(seq 1 6) \
+        ::: $(seq 1 {{REPS_SIM}})
 
 illustration_score2:
     uv run bin/illustration_score2.py female
@@ -35,14 +37,14 @@ analysis_score2:
 plot_simulation:
     parallel --bar --lb uv run bin/plot/{1}.py {{DATE}} ::: \
         aggregation_simulation \
-        selection_simulation \
-        breslow_simulation \
-        estimator_simulation \
-        scatter_simulation \
-        sketch \
-        validation_simulation \
-        kernel_simulation \
-        regularisation_simulation \
+        #selection_simulation \
+        #breslow_simulation \
+        #estimator_simulation \
+        #scatter_simulation \
+        #sketch \
+        #validation_simulation \
+        #kernel_simulation \
+        #regularisation_simulation \
 
 plot_score2:
     parallel --bar --lb uv run bin/plot/{1}.py {{DATE}} ::: \

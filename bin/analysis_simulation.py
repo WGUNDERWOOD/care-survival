@@ -9,6 +9,12 @@ from care_survival import embedding as care_embedding
 from care_survival import aggregation as care_aggregation
 from care_survival import distributions as care_distributions
 
+# DGP 1: univariate, moderate censoring min(U[1/5, 2], 1)
+# DGP 2: multivariate, moderate censoring min(U[1/5, 2], 1)
+# DGP 3: univariate, heavy censoring U[0, 1]
+# DGP 4: multivariate, heavy censoring U[0, 1]
+# DGP 5: univariate, no censoring
+# DGP 6: multivariate, no censoring
 
 def main():
     dgp = int(sys.argv[1])
@@ -27,17 +33,12 @@ def main():
         120,
         150,
         200,
-        250,
-        300,
-        350,
-        400,
-        450,
-        500,
-        600,
-        700,
-        800,
-        900,
-        1000,
+        #250,
+        #300,
+        #350,
+        #400,
+        #450,
+        #500,
     ]
     ns.sort(reverse=True)
     nystrom_ms = [min(n, 60) for n in ns]
@@ -55,10 +56,10 @@ def main():
     with_metrics = {
             "ln": ["valid", "test"],
             "l2": ["test"],
-            "concordance": ["test"],
-            "brier": ["test"],
+            #"concordance": ["test"],
+            #"brier": ["test"],
     }
-    n_brier_ts = 25
+    n_brier_ts = 0
     brier_ts = np.linspace(0, 1, num=n_brier_ts)
     verbose = False
     #verbose = True
