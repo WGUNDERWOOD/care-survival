@@ -33,15 +33,15 @@ def main():
         120,
         150,
         200,
-        #250,
-        #300,
-        #350,
-        #400,
-        #450,
-        #500,
+        250,
+        300,
+        350,
+        400,
+        450,
+        500,
     ]
     ns.sort(reverse=True)
-    nystrom_ms = [min(n, 60) for n in ns]
+    nystrom_ms = [min(n, 100) for n in ns]
     n_test = 500
 
     distribution = care_distributions.get_distribution(dgp)
