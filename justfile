@@ -37,7 +37,7 @@ analysis_score2:
 plot_simulation:
     parallel --bar --lb uv run bin/plot/{1}.py {{DATE}} ::: \
         aggregation_simulation \
-        #selection_simulation \
+        selection_simulation \
         #breslow_simulation \
         #estimator_simulation \
         #scatter_simulation \
