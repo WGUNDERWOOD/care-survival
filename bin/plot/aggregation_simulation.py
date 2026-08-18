@@ -78,7 +78,6 @@ def plot_aggregation(csv_path, plot_path, dgp, metric):
 for dgp in [str(i) for i in range(1, 7)]:
     #for metric in ["l2", "concordance", "brier"]:
     for metric in ["l2"]:
-        print(dgp, metric)
         date = sys.argv[1]
         csv_path = "data/" + date + "/simulation/analysis/"
         plot_path = "plot/aggregation_dgp_" + dgp + "_" + metric + ".pdf"

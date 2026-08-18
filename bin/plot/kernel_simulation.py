@@ -54,7 +54,7 @@ def plot_kernel(csv_path, plot_path, dgp):
 
 
 #for dgp in ["1"]:
-for dgp in ["1", "2"]:
+for dgp in [str(s) for s in range(1, 7)]:
     date = sys.argv[1]
     csv_path = "data/" + date + "/simulation/analysis/"
     plot_path = "plot/kernel_dgp_" + dgp + ".pdf"
