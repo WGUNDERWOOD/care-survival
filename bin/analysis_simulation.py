@@ -48,8 +48,12 @@ def main():
     a = 1
     kernel = care_kernels.ShiftedFirstOrderSobolevKernel(a)
     n_gammas = 50
-    gamma_min = 1e-5
-    gamma_max = 1e1
+    if dgp in [1, 3, 5]:
+        gamma_min = 1e-5
+        gamma_max = 1e1
+    elif dgp in [2, 4, 6]:
+        gamma_min = 1e-7
+        gamma_max = 1e-1
     method = "kernel"
     simplex_resolution = 0.05
     np.random.seed(rep)

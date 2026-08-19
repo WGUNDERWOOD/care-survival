@@ -74,8 +74,8 @@ def plot_aggregation(csv_path, plot_path, dgp, metric):
     plt.close("all")
 
 
-#for dgp in [str(i) for i in range(3, 5)]:
-for dgp in [str(i) for i in range(1, 7)]:
+#for dgp in [str(i) for i in range(1, 7)]:
+for dgp in ["4", "6"]:
     #for metric in ["l2", "concordance", "brier"]:
     for metric in ["l2"]:
         date = sys.argv[1]

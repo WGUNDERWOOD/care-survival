@@ -51,10 +51,10 @@ def plot_regularisation(csv_path, plot_path, dgp):
             fc=common.std_col(),
         )
 
-    #if dgp == "1":
-        #plt.ylim([9.2e-4, 1.1e-2])
-    #elif dgp == "2":
-        #plt.ylim([9.2e-4, 3.3e-2])
+    if dgp in ["1", "3", "5"]:
+        plt.ylim([9.2e-5, 3.3e-3])
+    #else:
+        #plt.ylim([8.2e-6, 3.3e-4])
 
     ax.set_yscale("log")
     plt.xlabel("Sample size $n$")
@@ -64,8 +64,8 @@ def plot_regularisation(csv_path, plot_path, dgp):
     plt.close("all")
 
 
-#for dgp in ["1"]:
-for dgp in [str(s) for s in range(1, 7)]:
+#for dgp in [str(s) for s in range(1, 7)]:
+for dgp in ["4", "6"]:
     date = sys.argv[1]
     csv_path = "data/" + date + "/simulation/analysis/"
     plot_path = "plot/regularisation_dgp_" + dgp + ".pdf"
