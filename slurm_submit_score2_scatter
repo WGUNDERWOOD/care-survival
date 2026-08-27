@@ -1,0 +1,38 @@
+#!/bin/bash
+#SBATCH -J score2_care
+#SBATCH -A SAMWORTH-SL3-CPU
+#SBATCH -p icelake
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=6
+#SBATCH --mail-type=ALL
+#SBATCH --time=03:00:00
+#SBATCH --array=1-4
+
+#! Set up modules and environment
+. /etc/profile.d/modules.sh
+module purge
+module load parallel
+module load ceuadmin/uv
+export I_MPI_PIN_DOMAIN=omp:compact
+export I_MPI_PIN_ORDER=scatter
+export OMP_NUM_THREADS=4
+export MKL_NUM_THREADS=4
+export OPENBLAS_NUM_THREADS=4
+cd $SLURM_SUBMIT_DIR
+echo "Started: $(date)"
+
+#! Unpack job array
+MODEL=$(( ($SLURM_ARRAY_TASK_ID - 1) / 2 + 1 ))
+SEX_ID=$(( ($SLURM_ARRAY_TASK_ID - 1) % 2 ))
+if (( SEX_ID == 0 )); then
+    SEX="female"
+else
+    SEX="male"
+fi
+REP=1
+
+echo "Array ID: $SLURM_ARRAY_TASK_ID"
+uv run ./bin/scatter_score2.py $MODEL $SEX $REP
+
+echo "Finished: $(date)"
