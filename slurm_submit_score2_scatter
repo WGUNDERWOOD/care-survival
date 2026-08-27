@@ -6,8 +6,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
 #SBATCH --mail-type=ALL
-#SBATCH --time=03:00:00
-#SBATCH --array=1-4
+#SBATCH --time=01:00:00
+#SBATCH --array=1-6
 
 #! Set up modules and environment
 . /etc/profile.d/modules.sh
