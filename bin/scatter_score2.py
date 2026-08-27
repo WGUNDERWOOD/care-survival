@@ -22,8 +22,8 @@ def main():
     _n_male = 121333
     n_female_over_3 = 54227
     n_male_over_3 = 40444
-    #dry_run = False
-    dry_run = True
+    dry_run = False
+    #dry_run = True
 
     # set up parameters
     if dry_run:
@@ -33,9 +33,13 @@ def main():
         if sex == "female":
             n = n_female_over_3
             n_test = n_female_over_3
+            #n = 10000
+            #n_test = 10000
         elif sex == "male":
             n = n_male_over_3
             n_test = n_male_over_3
+            #n = 4000
+            #n_test = 4000
 
     # more set-up
     a = 1
@@ -80,14 +84,13 @@ def main():
     cares.append(care)
 
     # model survival probability
-    ts = np.array([0.1]) # TODO get 10-year SCORE2 t-value
+    ts = np.array([1.0]) # TODO get 10-year SCORE2 t-value
     f_check_train = care.best["aggregated"]["ln"]["valid"].f_check["train"]
     f_check_test = care.best["aggregated"]["ln"]["valid"].f_check["test"]
     T = embedding.data["train"].T
     N = embedding.data["train"].N
     sn_check = care_kernel_estimator.get_sn(embedding.data["train"], np.exp(f_check_train))
     survival_prob_check = care_metrics.get_survival_prob(T, N, sn_check, f_check_test, ts)
-    print(survival_prob_check)
 
     # SCORE2 survival probability
     f_tilde_train = care.best["external"]["ln"]["valid"].f_check["train"]
@@ -99,6 +102,15 @@ def main():
         "survival_prob_tilde": survival_prob_tilde,
         "survival_prob_check": survival_prob_check,
     })
+    #print(results)
+
+    # plot
+    #import plotille
+    #fig = plotille.Figure()
+    #fig.width = 60
+    #fig.height = 30
+    #fig.scatter(1-survival_prob_tilde, 1-survival_prob_check)
+    #print(fig.show())
 
     # write results
     path = f"./data/{today}/score2/scatter/"
@@ -134,8 +146,7 @@ def get_model_params(model, a):
         p = 2
         gamma_min = 1e-8
         gamma_max = 1e-2
-        #n_gammas = 50
-        n_gammas = 5
+        n_gammas = 50
     elif model in [4, 5, 9, 10]:
         p = 1
         gamma_min = 0.0
