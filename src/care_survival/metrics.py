@@ -128,6 +128,7 @@ def get_pointwise_brier(T, N, I, Z, R_bar, sn, f, brier_ts):
             T, N, np.exp(f), G_T, p, G_ts, k)
     return pointwise_brier
 
+
 def get_brier_split(f, embedding, split, brier_ts):
     embedding_data = embedding.data[split]
     T = embedding_data.T
@@ -139,6 +140,14 @@ def get_brier_split(f, embedding, split, brier_ts):
     pointwise_brier = get_pointwise_brier(T, N, I, Z, R_bar, sn, f, brier_ts)
     brier = np.sum(pointwise_brier) / len(brier_ts)
     return brier
+
+
+def get_survival_prob(T, N, sn, f, ts):
+    n = len(T)
+    k = np.searchsorted(T, ts, side="right")
+    p = np.r_[0.0, np.cumsum(N / sn)][k] / n
+    survival_prob = np.exp(np.exp(f) * (-p))
+    return survival_prob
 
 
 def get_metric_split(f, embedding, metric, split, with_metrics, brier_ts):
