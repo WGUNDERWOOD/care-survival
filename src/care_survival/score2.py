@@ -10,8 +10,7 @@ def get_score2_data(n_train, n_valid, n_test, covs, sex, dry_run, rep):
         file = pd.read_csv("./data/score2_test.csv")
 
     else:
-        path = "~/rds/rds-ceu-ukbiobank-RtePkTecWB4/projects/"
-        path += f"P7439/lambertlab/wgu21/data/df_scaled_{sex}.csv"
+        path = ""
         file = pd.read_csv(path)
 
     n_avail = len(file)

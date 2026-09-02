@@ -3,9 +3,7 @@
 #
 #
 #def main():
-#    directory = "~/rds/rds-ceu-ukbiobank-RtePkTecWB4"
-#    directory += "projects/P7439/lambertlab/wgu21/data"
-#    path = directory + "df_SCORE2_withexclusions.csv"
+#    path = ""
 #    df = pd.read_csv(path)
 #    df = df[df["imd_country"] == "England"]
 #
