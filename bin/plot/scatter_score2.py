@@ -43,7 +43,7 @@ def plot_box_score2(csv_path, plot_path, sex):
     plt.close("all")
 
 #for model in ["1"]:
-for model in ["5", "8"]:
+for model in [str(s) for s in range(6, 9)]:
     #for sex in ["female"]:
     for sex in ["female", "male"]:
         print(f"Model {model}, {sex}")

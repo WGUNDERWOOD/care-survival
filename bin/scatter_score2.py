@@ -57,7 +57,7 @@ def main():
     #verbose = False
     cares = []
 
-    nystrom_m = 1
+    nystrom_m = 100
     now = datetime.now().strftime("%H:%M:%S.%f")
     print(f"{now}, model = {model}, sex = {sex}, rep = {rep}, n = {n}", flush=True)
 
@@ -84,7 +84,7 @@ def main():
     cares.append(care)
 
     # model survival probability
-    ts = np.array([1.0]) # TODO get 10-year SCORE2 t-value
+    ts = np.array([1.0])
     f_check_train = care.best["aggregated"]["ln"]["valid"].f_check["train"]
     f_check_test = care.best["aggregated"]["ln"]["valid"].f_check["test"]
     T = embedding.data["train"].T

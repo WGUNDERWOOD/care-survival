@@ -2,7 +2,7 @@ REPS_SIM := "200"
 #REPS_SIM := "60"
 #REPS_SCORE2 := "20"
 REPS_SCORE2 := "2"
-DATE := "2026-08-19"
+DATE := "2026-09-11"
 
 default: simulation plot_simulation
 
@@ -51,6 +51,7 @@ plot_score2:
         aggregation_score2 \
         brier_score2 \
         selection_score2 \
+        scatter_score2 \
         #breslow_score2 \
 
 profile:

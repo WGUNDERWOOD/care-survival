@@ -49,7 +49,7 @@ def plot_selection_score2(csv_path, plot_path, sex, model):
     plt.close("all")
 
 
-for model in [str(s) for s in range(1, 11)]:
+for model in [str(s) for s in range(6, 11)]:
     for sex in ["female", "male"]:
         date = sys.argv[1]
         csv_path = "data/" + date + "/score2/analysis/"
