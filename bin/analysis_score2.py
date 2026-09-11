@@ -148,9 +148,9 @@ def get_model_params(model, a):
         method = "kernel"
 
     # covariates
-    if model in [2, 4]:
+    if model in [2, 4, 7, 9]:
         covs += ["imd"]
-    elif model in [3, 5]:
+    elif model in [3, 5, 8, 10]:
         covs += ["imd", "pgs000018", "pgs000039"]
 
     return (covs, p, gamma_min, gamma_max, n_gammas, kernel, method)
