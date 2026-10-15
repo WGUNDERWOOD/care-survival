@@ -33,8 +33,12 @@ def main():
 
     # run CARE
     n_gammas = 50
-    gamma_min = 1e-5
-    gamma_max = 1e1
+    if dgp == 1:
+        gamma_min = 1e-5
+        gamma_max = 1e1
+    elif dgp == 2:
+        gamma_min = 1e-7
+        gamma_max = 1e-1
     simplex_resolution = 1
     with_metrics = {
             "ln": ["train", "valid"],
