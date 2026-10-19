@@ -63,3 +63,10 @@ test:
 
 compress:
     tar -czf data.tar.gz data/{{DATE}}
+
+journal:
+    rm -rf care_survival_journal care_survival_journal.tar.gz
+    mkdir -p care_survival_journal
+    cp -r bin justfile pyproject.toml README.md src tests care_survival_journal
+    tar -czf care_survival_journal.tar.gz care_survival_journal
+
